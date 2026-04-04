@@ -22,7 +22,14 @@ export async function PATCH(
   const db = getDb()
   const body = await request.json()
 
-  const fields = Object.keys(body)
+  const ALLOWED_FIELDS = new Set([
+    'category', 'urgency', 'sentiment', 'confidence', 'summary',
+    'status', 'assignedTo', 'autoReplyDraft', 'clusterId',
+  ])
+  const fields = Object.keys(body).filter((f) => ALLOWED_FIELDS.has(f))
+  if (fields.length === 0) {
+    return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+  }
   const sets = fields.map((f) => `"${f}" = ?`).join(', ')
   const values = fields.map((f) => body[f])
 

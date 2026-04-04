@@ -8,6 +8,24 @@ export async function GET() {
   const totalEmails = (db.prepare('SELECT COUNT(*) as count FROM emails').get() as CountRow).count
   const autoResolved = (db.prepare("SELECT COUNT(*) as count FROM emails WHERE status IN ('auto_replied', 'resolved')").get() as CountRow).count
   const openIssues = (db.prepare("SELECT COUNT(*) as count FROM clusters WHERE severity IN ('high', 'critical')").get() as CountRow).count
+  const debtRows = db.prepare(
+    `SELECT urgency, COUNT(*) as count
+     FROM emails
+     WHERE status IN ('new', 'routed', 'needs_review')
+     GROUP BY urgency`
+  ).all() as { urgency: Urgency | null; count: number }[]
+
+  const supportDebt = debtRows.reduce((total, row) => {
+    const debtValue = row.urgency === 'critical'
+      ? 3200
+      : row.urgency === 'high'
+        ? 1200
+        : row.urgency === 'medium'
+          ? 350
+          : 75
+
+    return total + row.count * debtValue
+  }, 0)
 
   const categoryRows = db.prepare(
     'SELECT category, COUNT(*) as count FROM emails WHERE category IS NOT NULL GROUP BY category'
@@ -45,8 +63,9 @@ export async function GET() {
   return NextResponse.json({
     totalEmails,
     autoResolved,
-    avgResponseTime: 28,
+    avgResponseTime: autoResolved > 0 ? 1 : 0,
     openIssues,
+    supportDebt,
     categoryBreakdown,
     urgencyBreakdown,
     routingQueue,

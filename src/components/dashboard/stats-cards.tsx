@@ -11,8 +11,17 @@ export function StatsCards({ stats }: StatsCardsProps) {
 
   const cards = [
     {
+      label: 'Support Debt',
+      value: `$${stats.supportDebt.toLocaleString()}`,
+      numericValue: stats.supportDebt,
+      color: '#ffd6a8',
+      trend: 'Estimated revenue at risk in unresolved conversations',
+      accent: 'rgba(243,179,107,0.28)',
+    },
+    {
       label: 'Total Emails',
       value: stats.totalEmails,
+      numericValue: stats.totalEmails,
       color: '#f7cf9a',
       trend: `+${Math.floor(stats.totalEmails * 0.25)} today`,
       accent: 'rgba(243,179,107,0.24)',
@@ -20,20 +29,23 @@ export function StatsCards({ stats }: StatsCardsProps) {
     {
       label: 'Auto-Resolved',
       value: stats.autoResolved,
+      numericValue: stats.autoResolved,
       color: '#8ce7b1',
       trend: `${stats.totalEmails > 0 ? Math.round((stats.autoResolved / stats.totalEmails) * 100) : 0}% resolution rate`,
       accent: 'rgba(74,222,128,0.2)',
     },
     {
-      label: 'Avg Response',
-      value: `${stats.avgResponseTime}s`,
+      label: 'AI Speed',
+      value: stats.autoResolved > 0 ? '< 1m' : '—',
+      numericValue: stats.avgResponseTime,
       color: '#91c8ff',
-      trend: 'vs 4.2h industry avg',
+      trend: 'AI auto-reply speed',
       accent: 'rgba(96,165,250,0.18)',
     },
     {
       label: 'Open Issues',
       value: stats.openIssues,
+      numericValue: stats.openIssues,
       color: '#f8a88f',
       trend: `${stats.openIssues} critical clusters`,
       accent: 'rgba(248,117,92,0.18)',
@@ -41,7 +53,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
   ]
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {cards.map((card) => (
         <div
           key={card.label}
@@ -65,8 +77,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
                     100,
                     card.label === 'Avg Response'
                       ? 82
-                      : typeof card.value === 'number'
-                        ? Math.max(16, Math.min(card.value * 8, 100))
+                      : typeof card.numericValue === 'number'
+                        ? Math.max(16, Math.min(card.numericValue * 8, 100))
                         : 72
                   )}%`,
                   background: card.color,

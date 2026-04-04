@@ -49,6 +49,7 @@ export interface DashboardStats {
   autoResolved: number
   avgResponseTime: number
   openIssues: number
+  supportDebt: number
   categoryBreakdown: Record<Category, number>
   urgencyBreakdown: Record<Urgency, number>
   routingQueue: Record<string, number>
@@ -69,4 +70,17 @@ export interface GmailSyncEmail {
 
 export interface GmailStatus {
   connected: boolean
+}
+
+// V7 Screen types
+export type ScreenId = 'deploy' | 'sweep' | 'brief' | 'rules' | 'command'
+export type TonePreset = 'calm' | 'apologetic' | 'concise' | 'premium'
+export type SweepPhase = 'idle' | 'syncing' | 'classifying' | 'clustering' | 'complete' | 'error'
+
+export interface SweepStepData {
+  id: string
+  label: string
+  status: 'pending' | 'running' | 'done' | 'error'
+  detail?: string
+  timestamp?: number
 }
