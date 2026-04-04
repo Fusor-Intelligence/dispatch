@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { ClassificationResult } from './types'
+import type { ClassificationResult, Severity } from './types'
 
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || ''
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || ''
@@ -255,7 +255,7 @@ export async function generateReply(from: string, subject: string, body: string,
   return sanitizeReply(reply, from)
 }
 
-export async function clusterIssues(summaries: { id: string; summary: string; category: string }[]): Promise<Array<{ title: string; emailIds: string[]; severity: string; suggestedAction: string }>> {
+export async function clusterIssues(summaries: { id: string; summary: string; category: string }[]): Promise<Array<{ title: string; emailIds: string[]; severity: Severity; suggestedAction: string }>> {
   const userPrompt = summaries
     .map((s) => `[${s.id}] (${s.category}) ${s.summary}`)
     .join('\n')
