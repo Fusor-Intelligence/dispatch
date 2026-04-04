@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch — Dashboard V3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --bg-surface: #FFFFFF;
+    --bg-muted: #EFEEE9;
+    --bg-hover: #F0EFE9;
+    --border: #DAD8D0;
+    --border-strong: #1A1A1A;
+    --text: #0F0F0F;
+    --text-secondary: #5C5C5C;
+    --text-muted: #9A9A8E;
+    --accent: #1D4ED8;
+    --accent-bg: #EFF4FF;
+    --red: #DC2626;
+    --red-bg: #FEF2F2;
+    --green: #16A34A;
+    --green-bg: #F0FDF4;
+    --orange: #CA8A04;
+    --orange-bg: #FEFCE8;
+    --teal: #0D9488;
+    --purple: #7C3AED;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== MASTHEAD BAR ===== */
+  .masthead {
+    height: 4px;
+    background: linear-gradient(90deg, var(--border-strong) 0%, var(--border-strong) 60%, var(--red) 60%, var(--red) 70%, var(--orange) 70%, var(--orange) 80%, var(--green) 80%, var(--green) 90%, var(--accent) 90%);
+  }
+
+  /* ===== TOP NAV ===== */
+  .topnav {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topnav-left { display: flex; align-items: center; gap: 32px; }
+  .brand {
+    font-family: 'Young Serif', serif;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--border-strong);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Young Serif', serif;
+    font-size: 16px;
+    border-radius: 4px;
+  }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-link:hover { background: var(--bg-muted); color: var(--text); }
+  .nav-link.active {
+    color: var(--text);
+    background: var(--bg-muted);
+    font-weight: 600;
+  }
+  .nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .topnav-right { display: flex; align-items: center; gap: 12px; }
+  .search-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px 7px 32px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    width: 220px;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-wrap { position: relative; }
+  .search-wrap::before {
+    content: "\2315";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-dark {
+    background: var(--border-strong);
+    color: white;
+  }
+  .btn-dark:hover { background: #333; }
+  .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { background: var(--bg-muted); color: var(--text); }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    display: inline-block;
+    animation: blink 2.5s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ===== CONTENT WRAPPER ===== */
+  .page { max-width: 1440px; margin: 0 auto; padding: 24px 32px 48px; }
+
+  /* ===== KPI STRIP ===== */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--bg-surface);
+    padding: 20px 24px;
+    position: relative;
+  }
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .kpi-row { display: flex; align-items: baseline; gap: 12px; }
+  .kpi-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .kpi-trend {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+  .kpi-spark {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    opacity: 0.5;
+  }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+  .warn { color: var(--orange); }
+
+  /* ===== ALERT STRIP ===== */
+  .alert-strip {
+    background: var(--red-bg);
+    border: 1px solid #FECACA;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .alert-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--red);
+    color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .alert-content { flex: 1; }
+  .alert-title { font-size: 13px; font-weight: 700; color: var(--red); }
+  .alert-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .alert-actions { display: flex; gap: 8px; }
+  .btn-alert {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.12s;
+  }
+  .btn-alert-primary { background: var(--red); color: white; }
+  .btn-alert-primary:hover { background: #B91C1C; }
+  .btn-alert-ghost { background: transparent; color: var(--red); border: 1px solid #FECACA; }
+  .btn-alert-ghost:hover { background: white; }
+
+  /* ===== SECTION HEADER ===== */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-strong);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 500;
+  }
+
+  /* ===== CLUSTER CARDS ===== */
+  .clusters { margin-bottom: 28px; }
+  .cluster-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 0;
+  }
+  .cluster {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cluster:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .cluster::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+  }
+  .cluster.critical::before { background: var(--red); }
+  .cluster.high::before { background: var(--orange); }
+  .cluster.medium::before { background: var(--orange); opacity: 0.5; }
+  .cluster-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
+  .cluster-name { font-size: 13px; font-weight: 700; line-height: 1.4; }
+  .sev-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sev-critical { background: var(--red); color: white; }
+  .sev-high { background: var(--orange); color: white; }
+  .sev-medium { background: var(--orange-bg); color: var(--orange); border: 1px solid #FDE68A; }
+  .cluster-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .cluster-meta strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .cluster-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--bg-muted);
+  }
+
+  /* ===== MAIN GRID ===== */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ===== INBOX ===== */
+  .inbox {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .inbox-top {
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .inbox-title {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .inbox-title .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .filters { display: flex; gap: 4px; }
+  .filter {
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .filter:hover { color: var(--text-secondary); background: var(--bg-muted); }
+  .filter.on { background: var(--bg-muted); color: var(--text); border-color: var(--border); }
+
+  /* Table header */
+  .row {
+    display: grid;
+    grid-template-columns: 24px 20px 1fr 72px 64px 56px 80px 44px;
+    align-items: center;
+    padding: 0 20px;
+    height: 44px;
+    gap: 10px;
+    border-bottom: 1px solid var(--bg-muted);
+    font-size: 13px;
+    transition: background 0.08s;
+  }
+  .row:hover { background: var(--bg-hover); }
+  .row.head {
+    height: 36px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .row.head:hover { background: var(--bg); }
+
+  .check {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.12s;
+    background: transparent;
+  }
+  .check:checked { background: var(--accent); border-color: var(--accent); }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-crit { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
+  .dot-high { background: var(--orange); box-shadow: 0 0 0 3px var(--orange-bg); }
+  .dot-med { background: var(--orange); opacity: 0.5; }
+  .dot-low { background: var(--border); }
+
+  .email-cell { overflow: hidden; }
+  .email-from { font-size: 13px; font-weight: 600; }
+  .email-subj {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0.2px;
+  }
+  .tag-bug { background: var(--red-bg); color: var(--red); }
+  .tag-refund { background: var(--accent-bg); color: var(--accent); }
+  .tag-cancel { background: #F5F3FF; color: var(--purple); }
+  .tag-feature { background: #F0FDFA; color: var(--teal); }
+  .tag-inquiry { background: var(--bg-muted); color: var(--text-secondary); }
+  .tag-complaint { background: var(--orange-bg); color: var(--orange); }
+
+  .sentiment { font-size: 11px; font-weight: 600; }
+  .s-angry { color: var(--red); }
+  .s-neg { color: var(--orange); }
+  .s-neut { color: var(--text-muted); }
+  .s-pos { color: var(--green); }
+
+  .conf {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .st-auto { background: var(--green-bg); color: var(--green); }
+  .st-routed { background: var(--accent-bg); color: var(--accent); }
+  .st-review { background: var(--orange-bg); color: var(--orange); }
+  .st-new { background: var(--bg-muted); color: var(--text-muted); }
+
+  .time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .card-head {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* Donut */
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .donut-svg { position: relative; width: 140px; height: 140px; }
+  .donut-svg svg { transform: rotate(-90deg); }
+  .donut-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+    letter-spacing: -1px;
+  }
+  .donut-sub { font-size: 10px; color: var(--text-muted); }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; width: 100%; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .leg-pct {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* Bar chart */
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 90px; }
+  .bar-g { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .bar-v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 2px 2px;
+    min-height: 4px;
+    transition: opacity 0.12s;
+  }
+  .bar-g:hover .bar { opacity: 0.75; }
+  .bar-l { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+  /* Routing */
+  .route {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--bg-muted);
+    font-size: 12px;
+  }
+  .route:last-child { border: none; padding-bottom: 0; }
+  .route-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .route-name { font-weight: 600; flex-shrink: 0; }
+  .route-bar-bg { flex: 1; height: 3px; background: var(--bg-muted); border-radius: 2px; overflow: hidden; }
+  .route-bar-fill { height: 100%; border-radius: 2px; }
+  .route-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 18px;
+    text-align: right;
+  }
+
+  /* Activity */
+  .act {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--bg-muted);
+    font-size: 12px;
+  }
+  .act:last-child { border: none; padding-bottom: 0; }
+  .act-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .act-text { color: var(--text-secondary); line-height: 1.4; }
+  .act-text b { color: var(--text); font-weight: 600; }
+  .act-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== STATUS BAR ===== */
+  .statusbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    background: var(--border-strong);
+    color: #AEAEA0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    z-index: 100;
+  }
+  .statusbar-left, .statusbar-right { display: flex; align-items: center; gap: 16px; }
+  .statusbar .green { color: #4ADE80; }
+  .statusbar .red { color: #F87171; }
+  .statusbar .dim { color: #666; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .sidebar { display: grid; grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 800px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .cluster-row { grid-template-columns: 1fr; }
+    .sidebar { grid-template-columns: 1fr; }
+    .page { padding: 16px; }
+    .topnav { padding: 0 16px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD COLOR BAR -->
+<div class="masthead"></div>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <div class="brand">
+      <div class="brand-mark">D</div>
+      Dispatch
+    </div>
+    <div class="nav-links">
+      <a class="nav-link active" href="#">Dashboard</a>
+      <a class="nav-link" href="#">Inbox <span class="nav-badge"></span></a>
+      <a class="nav-link" href="#">Clusters <span class="nav-badge" style="background:var(--orange)"></span></a>
+      <a class="nav-link" href="#">Automations</a>
+      <a class="nav-link" href="#">Analytics</a>
+      <a class="nav-link" href="#">Settings</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;">
+      <span class="live-dot"></span> Connected
+    </span>
+    <div class="search-wrap">
+      <input class="search-input" type="text" placeholder="Search emails...">
+    </div>
+    <button class="btn btn-outline">Export</button>
+    <button class="btn btn-dark">Sync Inbox</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">Total Emails</div>
+      <div class="kpi-row">
+        <div class="kpi-value">47</div>
+        <div class="kpi-trend up">+12 today</div>
+      </div>
+      <div class="kpi-sub">Processing 66% automatically</div>
+      <svg class="kpi-spark" viewBox="0 0 300 32" preserveAspectRatio="none">
+        <defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity="0.15"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
+        <polyline points="0,28 40,24 80,26 120,20 160,22 200,14 240,16 280,8 300,4 300,32 0,32" fill="url(#s1)" stroke="none"/>
+        <polyline points="0,28 40,24 80,26 120,20 160,22 200,14 240,16 280,8 300,4" fill="none" stroke="#7C3AED" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Auto-Resolved</div>
+      <div class="kpi-row">
+        <div class="kpi-value">31</div>
+        <div class="kpi-trend up">66%</div>
+      </div>
+      <div class="kpi-sub">Resolution rate trending up</div>
+      <svg class="kpi-spark" viewBox="0 0 300 32" preserveAspectRatio="none">
+        <defs><linearGradient id="s2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#16A34A" stop-opacity="0.12"/><stop offset="100%" stop-color="#16A34A" stop-opacity="0"/></linearGradient></defs>
+        <polyline points="0,26 40,22 80,24 120,18 160,16 200,12 240,10 280,6 300,4 300,32 0,32" fill="url(#s2)" stroke="none"/>
+        <polyline points="0,26 40,22 80,24 120,18 160,16 200,12 240,10 280,6 300,4" fill="none" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg Response</div>
+      <div class="kpi-row">
+        <div class="kpi-value">28s</div>
+        <div class="kpi-trend up">540x faster</div>
+      </div>
+      <div class="kpi-sub">Industry avg: 4.2 hours</div>
+      <svg class="kpi-spark" viewBox="0 0 300 32" preserveAspectRatio="none">
+        <defs><linearGradient id="s3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1D4ED8" stop-opacity="0.12"/><stop offset="100%" stop-color="#1D4ED8" stop-opacity="0"/></linearGradient></defs>
+        <polyline points="0,10 40,14 80,12 120,18 160,16 200,20 240,14 280,10 300,8 300,32 0,32" fill="url(#s3)" stroke="none"/>
+        <polyline points="0,10 40,14 80,12 120,18 160,16 200,20 240,14 280,10 300,8" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Open Issues</div>
+      <div class="kpi-row">
+        <div class="kpi-value" style="color:var(--red);">3</div>
+        <div class="kpi-trend down">2 critical</div>
+      </div>
+      <div class="kpi-sub">Requires immediate attention</div>
+    </div>
+  </div>
+
+  <!-- CRITICAL ALERT BANNER -->
+  <div class="alert-strip">
+    <div class="alert-icon">!</div>
+    <div class="alert-content">
+      <div class="alert-title">Checkout payment failing on mobile &mdash; 8 reports in 2 hours, trending up</div>
+      <div class="alert-desc">5 unique users affected. Cluster auto-detected from incoming support emails.</div>
+    </div>
+    <div class="alert-actions">
+      <button class="btn-alert btn-alert-primary">Escalate to Engineering</button>
+      <button class="btn-alert btn-alert-ghost">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- ISSUE CLUSTERS -->
+  <div class="clusters">
+    <div class="section-label">
+      Issue Clusters
+      <span class="section-count">3 active</span>
+    </div>
+    <div class="cluster-row">
+      <div class="cluster critical">
+        <div class="cluster-top">
+          <div class="cluster-name">Checkout payment failing on mobile</div>
+          <span class="sev-tag sev-critical">CRITICAL</span>
+        </div>
+        <div class="cluster-meta">
+          <span><strong>8</strong> reports</span>
+          <span><strong>5</strong> users</span>
+          <span><strong>2h</strong> window</span>
+        </div>
+        <div class="cluster-action">&rarr; Escalate to engineering</div>
+      </div>
+      <div class="cluster high">
+        <div class="cluster-top">
+          <div class="cluster-name">Wrong item shipped &mdash; fulfillment error</div>
+          <span class="sev-tag sev-high">HIGH</span>
+        </div>
+        <div class="cluster-meta">
+          <span><strong>3</strong> reports</span>
+          <span><strong>3</strong> users</span>
+          <span>same SKU</span>
+        </div>
+        <div class="cluster-action">&rarr; Flag ops, check SKU-4472</div>
+      </div>
+      <div class="cluster medium">
+        <div class="cluster-top">
+          <div class="cluster-name">Password reset broken on Safari</div>
+          <span class="sev-tag sev-medium">MEDIUM</span>
+        </div>
+        <div class="cluster-meta">
+          <span><strong>2</strong> reports</span>
+          <span>browser-specific</span>
+        </div>
+        <div class="cluster-action">&rarr; Add to bug backlog</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN: INBOX + SIDEBAR -->
+  <div class="main-grid">
+
+    <!-- INBOX TABLE -->
+    <div>
+      <div class="section-label">
+        Inbox
+        <span class="section-count">47 emails</span>
+      </div>
+      <div class="inbox">
+        <div class="inbox-top">
+          <div class="inbox-title">All Messages <span class="count">47</span></div>
+          <div class="filters">
+            <button class="filter on">All</button>
+            <button class="filter">Needs Review</button>
+            <button class="filter">Auto-Replied</button>
+            <button class="filter">Routed</button>
+          </div>
+        </div>
+
+        <div class="row head">
+          <span></span>
+          <span></span>
+          <span>From / Subject</span>
+          <span>Category</span>
+          <span>Mood</span>
+          <span>Score</span>
+          <span>Status</span>
+          <span>Time</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-crit"></span>
+          <div class="email-cell">
+            <div class="email-from">sarah.chen@acme.io</div>
+            <div class="email-subj">Payment declined during checkout &mdash; tried 3 times</div>
+          </div>
+          <span class="tag tag-bug">Bug</span>
+          <span class="sentiment s-angry">Angry</span>
+          <span class="conf">97%</span>
+          <span class="status st-routed">Routed</span>
+          <span class="time">2m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-med"></span>
+          <div class="email-cell">
+            <div class="email-from">james.w@outlook.com</div>
+            <div class="email-subj">I'd like a refund for order #8834</div>
+          </div>
+          <span class="tag tag-refund">Refund</span>
+          <span class="sentiment s-neut">Neutral</span>
+          <span class="conf">94%</span>
+          <span class="status st-auto">Auto</span>
+          <span class="time">8m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-high"></span>
+          <div class="email-cell">
+            <div class="email-from">maria.lopez@gmail.com</div>
+            <div class="email-subj">WRONG ITEM SHIPPED!! This is the second time!!</div>
+          </div>
+          <span class="tag tag-complaint">Complaint</span>
+          <span class="sentiment s-angry">Angry</span>
+          <span class="conf">91%</span>
+          <span class="status st-review">Review</span>
+          <span class="time">14m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-low"></span>
+          <div class="email-cell">
+            <div class="email-from">dev.tom@startup.co</div>
+            <div class="email-subj">Any plans to add Slack integration?</div>
+          </div>
+          <span class="tag tag-feature">Feature</span>
+          <span class="sentiment s-pos">Positive</span>
+          <span class="conf">89%</span>
+          <span class="status st-auto">Auto</span>
+          <span class="time">22m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-med"></span>
+          <div class="email-cell">
+            <div class="email-from">amy.k@company.org</div>
+            <div class="email-subj">Cancel my subscription effective immediately</div>
+          </div>
+          <span class="tag tag-cancel">Cancel</span>
+          <span class="sentiment s-neg">Negative</span>
+          <span class="conf">96%</span>
+          <span class="status st-auto">Auto</span>
+          <span class="time">31m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-crit"></span>
+          <div class="email-cell">
+            <div class="email-from">ops@bigclient.com</div>
+            <div class="email-subj">Mobile checkout broken &mdash; we process 200 orders/day through you</div>
+          </div>
+          <span class="tag tag-bug">Bug</span>
+          <span class="sentiment s-neg">Negative</span>
+          <span class="conf">98%</span>
+          <span class="status st-routed">Routed</span>
+          <span class="time">38m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-low"></span>
+          <div class="email-cell">
+            <div class="email-from">curious@newuser.io</div>
+            <div class="email-subj">How do I export my data as CSV?</div>
+          </div>
+          <span class="tag tag-inquiry">Inquiry</span>
+          <span class="sentiment s-neut">Neutral</span>
+          <span class="conf">92%</span>
+          <span class="status st-auto">Auto</span>
+          <span class="time">44m</span>
+        </div>
+
+        <div class="row">
+          <input type="checkbox" class="check">
+          <span class="dot dot-low"></span>
+          <div class="email-cell">
+            <div class="email-from">partner@agency.dev</div>
+            <div class="email-subj">Love the product, quick question about API limits</div>
+          </div>
+          <span class="tag tag-inquiry">Inquiry</span>
+          <span class="sentiment s-pos">Positive</span>
+          <span class="conf">88%</span>
+          <span class="status st-auto">Auto</span>
+          <span class="time">1h</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- Category donut -->
+      <div class="card">
+        <div class="card-head">Categories <span class="card-sub">Last 24h</span></div>
+        <div class="donut-wrap">
+          <div class="donut-svg">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#EFEEE9" stroke-width="16"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#1D4ED8" stroke-width="16"
+                stroke-dasharray="95 244.3" stroke-dashoffset="0" stroke-linecap="round"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#DC2626" stroke-width="16"
+                stroke-dasharray="67.9 271.4" stroke-dashoffset="-95" stroke-linecap="round"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#7C3AED" stroke-width="16"
+                stroke-dasharray="47.5 291.8" stroke-dashoffset="-162.9" stroke-linecap="round"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#0D9488" stroke-width="16"
+                stroke-dasharray="40.7 298.6" stroke-dashoffset="-210.4" stroke-linecap="round"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#CA8A04" stroke-width="16"
+                stroke-dasharray="40.7 298.6" stroke-dashoffset="-251.1" stroke-linecap="round"/>
+              <circle cx="70" cy="70" r="54" fill="none" stroke="#9A9A8E" stroke-width="16"
+                stroke-dasharray="47.5 291.8" stroke-dashoffset="-291.8" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-label">
+              <span class="donut-num">47</span>
+              <span class="donut-sub">total</span>
+            </div>
+          </div>
+          <div class="legend">
+            <div class="leg-item"><span class="leg-dot" style="background:#1D4ED8"></span> Refund <span class="leg-pct">28%</span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#DC2626"></span> Bug <span class="leg-pct">20%</span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#7C3AED"></span> Cancel <span class="leg-pct">14%</span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#0D9488"></span> Feature <span class="leg-pct">12%</span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#CA8A04"></span> Complaint <span class="leg-pct">12%</span></div>
+            <div class="leg-item"><span class="leg-dot" style="background:#9A9A8E"></span> Inquiry <span class="leg-pct">14%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Urgency bars -->
+      <div class="card">
+        <div class="card-head">Urgency <span class="card-sub">47 emails</span></div>
+        <div class="bars">
+          <div class="bar-g">
+            <div class="bar-v">8</div>
+            <div class="bar" style="height:28px; background: var(--border);"></div>
+            <div class="bar-l">Low</div>
+          </div>
+          <div class="bar-g">
+            <div class="bar-v">14</div>
+            <div class="bar" style="height:52px; background: var(--orange);"></div>
+            <div class="bar-l">Med</div>
+          </div>
+          <div class="bar-g">
+            <div class="bar-v">16</div>
+            <div class="bar" style="height:76px; background: #EA580C;"></div>
+            <div class="bar-l">High</div>
+          </div>
+          <div class="bar-g">
+            <div class="bar-v">9</div>
+            <div class="bar" style="height:42px; background: var(--red);"></div>
+            <div class="bar-l">Crit</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Routing queue -->
+      <div class="card">
+        <div class="card-head">Routing Queue <span class="card-sub">16 active</span></div>
+        <div class="route">
+          <span class="route-dot" style="background:var(--red)"></span>
+          <span class="route-name">Engineering</span>
+          <div class="route-bar-bg"><div class="route-bar-fill" style="width:100%;background:var(--red)"></div></div>
+          <span class="route-num">6</span>
+        </div>
+        <div class="route">
+          <span class="route-dot" style="background:var(--orange)"></span>
+          <span class="route-name">Sr. Support</span>
+          <div class="route-bar-bg"><div class="route-bar-fill" style="width:66%;background:var(--orange)"></div></div>
+          <span class="route-num">4</span>
+        </div>
+        <div class="route">
+          <span class="route-dot" style="background:var(--accent)"></span>
+          <span class="route-name">Product</span>
+          <div class="route-bar-bg"><div class="route-bar-fill" style="width:50%;background:var(--accent)"></div></div>
+          <span class="route-num">3</span>
+        </div>
+        <div class="route">
+          <span class="route-dot" style="background:var(--purple)"></span>
+          <span class="route-name">Manager</span>
+          <div class="route-bar-bg"><div class="route-bar-fill" style="width:33%;background:var(--purple)"></div></div>
+          <span class="route-num">2</span>
+        </div>
+        <div class="route">
+          <span class="route-dot" style="background:var(--teal)"></span>
+          <span class="route-name">General</span>
+          <div class="route-bar-bg"><div class="route-bar-fill" style="width:16%;background:var(--teal)"></div></div>
+          <span class="route-num">1</span>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="card">
+        <div class="card-head">Recent Activity</div>
+        <div class="act">
+          <div class="act-icon" style="background:var(--green-bg);color:var(--green);">&#10003;</div>
+          <div>
+            <div class="act-text"><b>Auto-replied</b> to james.w about refund #8834</div>
+            <div class="act-time">8 minutes ago</div>
+          </div>
+        </div>
+        <div class="act">
+          <div class="act-icon" style="background:var(--accent-bg);color:var(--accent);">&rarr;</div>
+          <div>
+            <div class="act-text"><b>Routed</b> sarah.chen to Engineering</div>
+            <div class="act-time">12 minutes ago</div>
+          </div>
+        </div>
+        <div class="act">
+          <div class="act-icon" style="background:var(--red-bg);color:var(--red);">!</div>
+          <div>
+            <div class="act-text"><b>New cluster</b> detected: mobile checkout failures</div>
+            <div class="act-time">18 minutes ago</div>
+          </div>
+        </div>
+        <div class="act">
+          <div class="act-icon" style="background:var(--green-bg);color:var(--green);">&#10003;</div>
+          <div>
+            <div class="act-text"><b>Auto-replied</b> to dev.tom about Slack integration</div>
+            <div class="act-time">22 minutes ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div class="statusbar">
+  <div class="statusbar-left">
+    <span class="green">CONNECTED</span>
+    <span class="dim">|</span>
+    <span>hackathon2026SF@gmail.com</span>
+    <span class="dim">|</span>
+    <span>Last sync: <span class="green">12s ago</span></span>
+  </div>
+  <div class="statusbar-right">
+    <span>31/47 auto-resolved</span>
+    <span class="dim">|</span>
+    <span><span class="red">2</span> clusters active</span>
+    <span class="dim">|</span>
+    <span>Dispatch v0.1</span>
+  </div>
+</div>
+
+</body>
+</html>

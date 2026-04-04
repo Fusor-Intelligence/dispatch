@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch — Dashboard V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #08080d;
+    --bg-surface: #0f0f16;
+    --bg-elevated: #16161f;
+    --bg-hover: #1c1c28;
+    --border: #1e1e2e;
+    --border-subtle: #16161f;
+    --text-primary: #eaeaf0;
+    --text-secondary: #8888a0;
+    --text-muted: #55556a;
+    --accent: #6366f1;
+    --accent-hover: #7c7ff7;
+    --accent-subtle: #6366f120;
+    --green: #22c55e;
+    --green-subtle: #22c55e18;
+    --red: #ef4444;
+    --red-subtle: #ef444418;
+    --orange: #f97316;
+    --orange-subtle: #f9731618;
+    --yellow: #eab308;
+    --yellow-subtle: #eab30818;
+    --blue: #3b82f6;
+    --blue-subtle: #3b82f618;
+    --purple: #a78bfa;
+    --purple-subtle: #a78bfa18;
+    --teal: #2dd4bf;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.3), 0 0 0 1px var(--border);
+    --shadow-elevated: 0 4px 16px rgba(0,0,0,.4), 0 0 0 1px var(--border);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== APP SHELL ===== */
+  .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+  /* ===== LEFT NAV ===== */
+  .nav {
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .nav-logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    padding: 0 12px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-logo .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+  }
+  .nav-section {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    padding: 20px 12px 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .nav-item.active { background: var(--accent-subtle); color: var(--accent-hover); }
+  .nav-item .icon { width: 18px; text-align: center; font-size: 14px; opacity: 0.7; }
+  .nav-item.active .icon { opacity: 1; }
+  .nav-item .nav-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .nav-spacer { flex: 1; }
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .nav-user-info { overflow: hidden; }
+  .nav-user-name { font-size: 13px; font-weight: 600; }
+  .nav-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* ===== MAIN CONTENT ===== */
+  .content { padding: 28px 32px; overflow-y: auto; }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .topbar h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .search-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px 8px 34px;
+    font-size: 13px;
+    color: var(--text-primary);
+    width: 240px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+    position: relative;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-wrap { position: relative; }
+  .search-wrap::before {
+    content: "\26B2";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sync-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--green);
+  }
+  .sync-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ===== STAT CARDS ===== */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-elevated); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+  .stat-card:nth-child(1)::after { background: linear-gradient(90deg, var(--accent), var(--purple)); }
+  .stat-card:nth-child(2)::after { background: linear-gradient(90deg, var(--green), var(--teal)); }
+  .stat-card:nth-child(3)::after { background: linear-gradient(90deg, var(--blue), #818cf8); }
+  .stat-card:nth-child(4)::after { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+  .stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .stat-value { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
+  .stat-trend {
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--red); }
+
+  /* Sparkline in stat cards */
+  .sparkline { margin-top: 12px; }
+  .sparkline svg { display: block; }
+
+  /* ===== CLUSTER ALERTS ===== */
+  .clusters { margin-bottom: 28px; }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .badge {
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .cluster-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .cluster-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    cursor: pointer;
+  }
+  .cluster-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-elevated); }
+  .cluster-card.critical {
+    border: 1px solid #ef444440;
+    background: linear-gradient(135deg, #ef444408, var(--bg-surface));
+  }
+  .cluster-card.critical::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #ef444430, transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cluster-card.high {
+    border: 1px solid #f9731640;
+    background: linear-gradient(135deg, #f9731608, var(--bg-surface));
+  }
+  .cluster-card.medium {
+    border: 1px solid #eab30840;
+    background: linear-gradient(135deg, #eab30808, var(--bg-surface));
+  }
+  .cluster-card > * { position: relative; z-index: 1; }
+  .cluster-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px; }
+  .cluster-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+  .cluster-severity {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .severity-critical { background: var(--red); color: white; }
+  .severity-high { background: var(--orange); color: white; }
+  .severity-medium { background: var(--yellow); color: #1a1a1a; }
+  .cluster-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .cluster-stat {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cluster-stat strong { color: var(--text-primary); font-weight: 600; }
+  .cluster-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .cluster-trend.up { background: var(--red-subtle); color: var(--red); }
+  .cluster-trend.stable { background: var(--yellow-subtle); color: var(--yellow); }
+  .cluster-action {
+    font-size: 12px;
+    color: var(--accent-hover);
+    font-weight: 500;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== MAIN GRID: INBOX + SIDEBAR ===== */
+  .main { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+
+  /* ===== INBOX TABLE ===== */
+  .inbox {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+  .inbox-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .inbox-title { font-size: 15px; font-weight: 700; }
+  .inbox-filters { display: flex; gap: 6px; }
+  .filter-chip {
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    font-family: inherit;
+  }
+  .filter-chip:hover { color: var(--text-primary); border-color: var(--border); }
+  .filter-chip.active {
+    background: var(--accent-subtle);
+    color: var(--accent-hover);
+    border-color: #6366f140;
+  }
+
+  .email-row {
+    display: grid;
+    grid-template-columns: 28px 24px 1fr 80px 72px 72px 88px 50px;
+    align-items: center;
+    padding: 11px 22px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 13px;
+    gap: 10px;
+    transition: background 0.1s;
+  }
+  .email-row:hover { background: var(--bg-hover); }
+  .email-row.header-row {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+    padding: 9px 22px;
+  }
+  .email-row.header-row:hover { background: var(--bg-elevated); }
+
+  /* Checkbox */
+  .row-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    appearance: none;
+    background: transparent;
+  }
+  .row-check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .urgency-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .urgency-critical { background: var(--red); box-shadow: 0 0 8px #ef444466; }
+  .urgency-high { background: var(--orange); box-shadow: 0 0 6px #f9731644; }
+  .urgency-medium { background: var(--yellow); }
+  .urgency-low { background: var(--text-muted); }
+
+  .email-content { overflow: hidden; }
+  .email-from { font-weight: 600; font-size: 13px; margin-bottom: 1px; }
+  .email-subject {
+    color: var(--text-secondary);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .category-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.2px;
+  }
+  .cat-refund { background: var(--accent-subtle); color: #818cf8; }
+  .cat-bug { background: var(--red-subtle); color: #f87171; }
+  .cat-cancel { background: var(--purple-subtle); color: #c084fc; }
+  .cat-feature { background: #2dd4bf18; color: #2dd4bf; }
+  .cat-inquiry { background: #94a3b818; color: #94a3b8; }
+  .cat-complaint { background: var(--orange-subtle); color: #fb923c; }
+
+  .sentiment { font-size: 12px; font-weight: 500; }
+  .sent-angry { color: var(--red); }
+  .sent-negative { color: var(--orange); }
+  .sent-neutral { color: var(--text-muted); }
+  .sent-positive { color: var(--green); }
+
+  .confidence {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .status-auto { background: var(--green-subtle); color: var(--green); }
+  .status-routed { background: var(--accent-subtle); color: #818cf8; }
+  .status-review { background: var(--orange-subtle); color: var(--orange); }
+  .status-new { background: var(--bg-hover); color: var(--text-muted); }
+
+  .email-time { font-size: 11px; color: var(--text-muted); text-align: right; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title .subtle { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+  /* Donut chart — SVG */
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .donut-chart { position: relative; width: 150px; height: 150px; }
+  .donut-chart svg { transform: rotate(-90deg); }
+  .donut-center-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-center-label .num { font-size: 26px; font-weight: 800; display: block; letter-spacing: -1px; }
+  .donut-center-label .sub { font-size: 10px; color: var(--text-muted); }
+
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; width: 100%; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
+  .legend-pct { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: 10px; }
+
+  /* Bar chart */
+  .bars { display: flex; align-items: flex-end; gap: 10px; height: 100px; padding: 0 4px; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bar {
+    width: 100%;
+    border-radius: 5px 5px 2px 2px;
+    min-height: 4px;
+    position: relative;
+    transition: opacity 0.15s;
+  }
+  .bar-group:hover .bar { opacity: 0.85; }
+  .bar-val {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+  }
+  .bar-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+  /* Routing queue */
+  .route-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 12px;
+  }
+  .route-row:last-child { border: none; padding-bottom: 0; }
+  .route-left { display: flex; align-items: center; gap: 10px; }
+  .route-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .route-team { font-weight: 500; }
+  .route-bar-wrap { flex: 1; margin: 0 14px; height: 4px; background: var(--bg-hover); border-radius: 2px; overflow: hidden; }
+  .route-bar { height: 100%; border-radius: 2px; }
+  .route-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    min-width: 20px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== ACTIVITY FEED CARD ===== */
+  .activity-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 12px;
+    align-items: flex-start;
+  }
+  .activity-item:last-child { border: none; padding-bottom: 0; }
+  .activity-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .activity-text { color: var(--text-secondary); line-height: 1.4; }
+  .activity-text strong { color: var(--text-primary); font-weight: 600; }
+  .activity-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1280px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { display: grid; grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 1024px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .cluster-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .nav { display: none; }
+    .sidebar { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== SIDEBAR NAV ===== -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-icon">D</div>
+      Dispatch
+    </div>
+
+    <div class="nav-item active">
+      <span class="icon">&#9632;</span> Dashboard
+    </div>
+    <div class="nav-item">
+      <span class="icon">&#9993;</span> Inbox
+      <span class="nav-badge">16</span>
+    </div>
+    <div class="nav-item">
+      <span class="icon">&#9881;</span> Clusters
+      <span class="nav-badge" style="background:var(--orange)">3</span>
+    </div>
+    <div class="nav-item">
+      <span class="icon">&#8633;</span> Automations
+    </div>
+
+    <div class="nav-section">Insights</div>
+    <div class="nav-item">
+      <span class="icon">&#9783;</span> Analytics
+    </div>
+    <div class="nav-item">
+      <span class="icon">&#9783;</span> Reports
+    </div>
+
+    <div class="nav-section">Settings</div>
+    <div class="nav-item">
+      <span class="icon">&#9881;</span> Integrations
+    </div>
+    <div class="nav-item">
+      <span class="icon">&#9783;</span> Team
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <div class="nav-user">
+      <div class="avatar">WS</div>
+      <div class="nav-user-info">
+        <div class="nav-user-name">Will S.</div>
+        <div class="nav-user-email">hackathon2026SF@gmail.com</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="content">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="sync-indicator">
+          <span class="sync-dot"></span> Live sync
+        </div>
+        <div class="search-wrap">
+          <input class="search-box" type="text" placeholder="Search emails...">
+        </div>
+        <button class="btn-ghost">Export</button>
+        <button class="btn-primary">&#8635; Sync Inbox</button>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-label">Total Emails</div>
+          <div class="stat-icon" style="background:var(--accent-subtle); color:var(--accent);">&#9993;</div>
+        </div>
+        <div class="stat-value" style="color:var(--purple);">47</div>
+        <div class="stat-trend trend-up">&#9650; +12 today</div>
+        <div class="sparkline">
+          <svg width="100%" height="32" viewBox="0 0 200 32" preserveAspectRatio="none">
+            <polyline points="0,28 25,24 50,26 75,20 100,22 125,14 150,16 175,8 200,4" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a78bfa" stop-opacity="0.2"/><stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/></linearGradient>
+            <polyline points="0,28 25,24 50,26 75,20 100,22 125,14 150,16 175,8 200,4 200,32 0,32" fill="url(#g1)" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-label">Auto-Resolved</div>
+          <div class="stat-icon" style="background:var(--green-subtle); color:var(--green);">&#10003;</div>
+        </div>
+        <div class="stat-value" style="color:var(--green);">31</div>
+        <div class="stat-trend trend-up">&#9650; 66% resolution rate</div>
+        <div class="sparkline">
+          <svg width="100%" height="32" viewBox="0 0 200 32" preserveAspectRatio="none">
+            <polyline points="0,26 25,22 50,24 75,18 100,16 125,12 150,10 175,6 200,4" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.2"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient>
+            <polyline points="0,26 25,22 50,24 75,18 100,16 125,12 150,10 175,6 200,4 200,32 0,32" fill="url(#g2)" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-label">Avg Response</div>
+          <div class="stat-icon" style="background:var(--blue-subtle); color:var(--blue);">&#9201;</div>
+        </div>
+        <div class="stat-value" style="color:var(--blue);">28s</div>
+        <div class="stat-trend trend-up">&#9650; vs 4.2h industry avg</div>
+        <div class="sparkline">
+          <svg width="100%" height="32" viewBox="0 0 200 32" preserveAspectRatio="none">
+            <polyline points="0,10 25,14 50,12 75,18 100,16 125,20 150,14 175,10 200,8" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.2"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></linearGradient>
+            <polyline points="0,10 25,14 50,12 75,18 100,16 125,20 150,14 175,10 200,8 200,32 0,32" fill="url(#g3)" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-label">Open Issues</div>
+          <div class="stat-icon" style="background:var(--orange-subtle); color:var(--orange);">&#9888;</div>
+        </div>
+        <div class="stat-value" style="color:var(--orange);">3</div>
+        <div class="stat-trend trend-down">&#9660; 2 critical clusters</div>
+      </div>
+    </div>
+
+    <!-- CLUSTER ALERTS -->
+    <div class="clusters">
+      <div class="section-header">
+        <div class="section-title">
+          Issue Clusters
+          <span class="badge">2 ACTIVE</span>
+        </div>
+        <button class="btn-ghost">View all</button>
+      </div>
+
+      <div class="cluster-grid">
+        <div class="cluster-card critical">
+          <div class="cluster-header">
+            <span class="cluster-title">Checkout payment failing on mobile</span>
+            <span class="cluster-severity severity-critical">CRITICAL</span>
+          </div>
+          <div class="cluster-stats">
+            <div class="cluster-stat"><strong>8</strong> reports</div>
+            <div class="cluster-stat"><strong>5</strong> users</div>
+            <div class="cluster-stat"><strong>2h</strong> window</div>
+            <span class="cluster-trend up">&#9650; Trending up</span>
+          </div>
+          <div class="cluster-action">&#8594; Escalate to engineering</div>
+        </div>
+
+        <div class="cluster-card high">
+          <div class="cluster-header">
+            <span class="cluster-title">Wrong item shipped &mdash; fulfillment error</span>
+            <span class="cluster-severity severity-high">HIGH</span>
+          </div>
+          <div class="cluster-stats">
+            <div class="cluster-stat"><strong>3</strong> reports</div>
+            <div class="cluster-stat"><strong>3</strong> users</div>
+            <div class="cluster-stat">same SKU</div>
+            <span class="cluster-trend stable">&#8212; Stable</span>
+          </div>
+          <div class="cluster-action">&#8594; Flag ops, check SKU-4472</div>
+        </div>
+
+        <div class="cluster-card medium">
+          <div class="cluster-header">
+            <span class="cluster-title">Password reset broken on Safari</span>
+            <span class="cluster-severity severity-medium">MEDIUM</span>
+          </div>
+          <div class="cluster-stats">
+            <div class="cluster-stat"><strong>2</strong> reports</div>
+            <div class="cluster-stat">browser-specific</div>
+            <span class="cluster-trend stable">&#8212; Stable</span>
+          </div>
+          <div class="cluster-action">&#8594; Add to bug backlog</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN: INBOX + SIDEBAR -->
+    <div class="main">
+
+      <!-- INBOX TABLE -->
+      <div class="inbox">
+        <div class="inbox-header">
+          <span class="inbox-title">Inbox <span style="color:var(--text-muted); font-weight:500;">(47)</span></span>
+          <div class="inbox-filters">
+            <button class="filter-chip active">All</button>
+            <button class="filter-chip">Needs Review</button>
+            <button class="filter-chip">Auto-Replied</button>
+            <button class="filter-chip">Routed</button>
+          </div>
+        </div>
+
+        <!-- Header row -->
+        <div class="email-row header-row">
+          <span></span>
+          <span></span>
+          <span>From / Subject</span>
+          <span>Category</span>
+          <span>Sentiment</span>
+          <span>Score</span>
+          <span>Status</span>
+          <span>Time</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-critical"></span>
+          <div class="email-content">
+            <div class="email-from">sarah.chen@acme.io</div>
+            <div class="email-subject">Payment declined during checkout &mdash; tried 3 times</div>
+          </div>
+          <span class="category-tag cat-bug">Bug</span>
+          <span class="sentiment sent-angry">Angry</span>
+          <span class="confidence">97%</span>
+          <span class="status-badge status-routed">Routed</span>
+          <span class="email-time">2m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-medium"></span>
+          <div class="email-content">
+            <div class="email-from">james.w@outlook.com</div>
+            <div class="email-subject">I'd like a refund for order #8834</div>
+          </div>
+          <span class="category-tag cat-refund">Refund</span>
+          <span class="sentiment sent-neutral">Neutral</span>
+          <span class="confidence">94%</span>
+          <span class="status-badge status-auto">Auto-Replied</span>
+          <span class="email-time">8m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-high"></span>
+          <div class="email-content">
+            <div class="email-from">maria.lopez@gmail.com</div>
+            <div class="email-subject">WRONG ITEM SHIPPED!! This is the second time!!</div>
+          </div>
+          <span class="category-tag cat-complaint">Complaint</span>
+          <span class="sentiment sent-angry">Angry</span>
+          <span class="confidence">91%</span>
+          <span class="status-badge status-review">Review</span>
+          <span class="email-time">14m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-low"></span>
+          <div class="email-content">
+            <div class="email-from">dev.tom@startup.co</div>
+            <div class="email-subject">Any plans to add Slack integration?</div>
+          </div>
+          <span class="category-tag cat-feature">Feature</span>
+          <span class="sentiment sent-positive">Positive</span>
+          <span class="confidence">89%</span>
+          <span class="status-badge status-auto">Auto-Replied</span>
+          <span class="email-time">22m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-medium"></span>
+          <div class="email-content">
+            <div class="email-from">amy.k@company.org</div>
+            <div class="email-subject">Cancel my subscription effective immediately</div>
+          </div>
+          <span class="category-tag cat-cancel">Cancel</span>
+          <span class="sentiment sent-negative">Negative</span>
+          <span class="confidence">96%</span>
+          <span class="status-badge status-auto">Auto-Replied</span>
+          <span class="email-time">31m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-critical"></span>
+          <div class="email-content">
+            <div class="email-from">ops@bigclient.com</div>
+            <div class="email-subject">Mobile checkout broken &mdash; we process 200 orders/day through you</div>
+          </div>
+          <span class="category-tag cat-bug">Bug</span>
+          <span class="sentiment sent-negative">Negative</span>
+          <span class="confidence">98%</span>
+          <span class="status-badge status-routed">Routed</span>
+          <span class="email-time">38m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-low"></span>
+          <div class="email-content">
+            <div class="email-from">curious@newuser.io</div>
+            <div class="email-subject">How do I export my data as CSV?</div>
+          </div>
+          <span class="category-tag cat-inquiry">Inquiry</span>
+          <span class="sentiment sent-neutral">Neutral</span>
+          <span class="confidence">92%</span>
+          <span class="status-badge status-auto">Auto-Replied</span>
+          <span class="email-time">44m</span>
+        </div>
+
+        <div class="email-row">
+          <input type="checkbox" class="row-check">
+          <span class="urgency-dot urgency-low"></span>
+          <div class="email-content">
+            <div class="email-from">partner@agency.dev</div>
+            <div class="email-subject">Love the product, quick question about API limits</div>
+          </div>
+          <span class="category-tag cat-inquiry">Inquiry</span>
+          <span class="sentiment sent-positive">Positive</span>
+          <span class="confidence">88%</span>
+          <span class="status-badge status-auto">Auto-Replied</span>
+          <span class="email-time">1h</span>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+
+        <!-- Category breakdown donut (SVG) -->
+        <div class="card">
+          <div class="card-title">Category Breakdown <span class="subtle">Last 24h</span></div>
+          <div class="donut-wrap">
+            <div class="donut-chart">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#1e1e2e" stroke-width="18"/>
+                <!-- Refund 28% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#6366f1" stroke-width="18"
+                  stroke-dasharray="101.9 262.3" stroke-dashoffset="0" stroke-linecap="round"/>
+                <!-- Bug 20% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#f87171" stroke-width="18"
+                  stroke-dasharray="72.8 291.4" stroke-dashoffset="-101.9" stroke-linecap="round"/>
+                <!-- Cancel 14% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#c084fc" stroke-width="18"
+                  stroke-dasharray="51.0 313.2" stroke-dashoffset="-174.7" stroke-linecap="round"/>
+                <!-- Feature 12% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#2dd4bf" stroke-width="18"
+                  stroke-dasharray="43.7 320.5" stroke-dashoffset="-225.7" stroke-linecap="round"/>
+                <!-- Complaint 12% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#fb923c" stroke-width="18"
+                  stroke-dasharray="43.7 320.5" stroke-dashoffset="-269.4" stroke-linecap="round"/>
+                <!-- Inquiry 14% -->
+                <circle cx="75" cy="75" r="58" fill="none" stroke="#94a3b8" stroke-width="18"
+                  stroke-dasharray="51.0 313.2" stroke-dashoffset="-313.1" stroke-linecap="round"/>
+              </svg>
+              <div class="donut-center-label">
+                <span class="num">47</span>
+                <span class="sub">total</span>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#6366f1"></span> Refund <span class="legend-pct">28%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#f87171"></span> Bug <span class="legend-pct">20%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#c084fc"></span> Cancel <span class="legend-pct">14%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#2dd4bf"></span> Feature <span class="legend-pct">12%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#fb923c"></span> Complaint <span class="legend-pct">12%</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#94a3b8"></span> Inquiry <span class="legend-pct">14%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Urgency bars -->
+        <div class="card">
+          <div class="card-title">Urgency Distribution <span class="subtle">47 emails</span></div>
+          <div class="bars">
+            <div class="bar-group">
+              <div class="bar-val">8</div>
+              <div class="bar" style="height:30px; background: linear-gradient(180deg, #6b6b80, #55556a);"></div>
+              <div class="bar-label">Low</div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-val">14</div>
+              <div class="bar" style="height:55px; background: linear-gradient(180deg, #eab308, #ca9a06);"></div>
+              <div class="bar-label">Med</div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-val">16</div>
+              <div class="bar" style="height:80px; background: linear-gradient(180deg, #f97316, #ea6c0e);"></div>
+              <div class="bar-label">High</div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-val">9</div>
+              <div class="bar" style="height:45px; background: linear-gradient(180deg, #ef4444, #dc2626);"></div>
+              <div class="bar-label">Critical</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Routing queue with progress bars -->
+        <div class="card">
+          <div class="card-title">Routing Queue <span class="subtle">16 active</span></div>
+          <div class="route-row">
+            <div class="route-left">
+              <span class="route-dot" style="background:var(--red)"></span>
+              <span class="route-team">Engineering</span>
+            </div>
+            <div class="route-bar-wrap"><div class="route-bar" style="width:100%; background:var(--red);"></div></div>
+            <span class="route-count">6</span>
+          </div>
+          <div class="route-row">
+            <div class="route-left">
+              <span class="route-dot" style="background:var(--orange)"></span>
+              <span class="route-team">Sr. Support</span>
+            </div>
+            <div class="route-bar-wrap"><div class="route-bar" style="width:66%; background:var(--orange);"></div></div>
+            <span class="route-count">4</span>
+          </div>
+          <div class="route-row">
+            <div class="route-left">
+              <span class="route-dot" style="background:var(--accent)"></span>
+              <span class="route-team">Product</span>
+            </div>
+            <div class="route-bar-wrap"><div class="route-bar" style="width:50%; background:var(--accent);"></div></div>
+            <span class="route-count">3</span>
+          </div>
+          <div class="route-row">
+            <div class="route-left">
+              <span class="route-dot" style="background:var(--purple)"></span>
+              <span class="route-team">Manager</span>
+            </div>
+            <div class="route-bar-wrap"><div class="route-bar" style="width:33%; background:var(--purple);"></div></div>
+            <span class="route-count">2</span>
+          </div>
+          <div class="route-row">
+            <div class="route-left">
+              <span class="route-dot" style="background:var(--teal)"></span>
+              <span class="route-team">General</span>
+            </div>
+            <div class="route-bar-wrap"><div class="route-bar" style="width:16%; background:var(--teal);"></div></div>
+            <span class="route-count">1</span>
+          </div>
+        </div>
+
+        <!-- Recent activity feed -->
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--green-subtle); color:var(--green);">&#10003;</div>
+            <div>
+              <div class="activity-text"><strong>Auto-replied</strong> to james.w about refund #8834</div>
+              <div class="activity-time">8 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--accent-subtle); color:var(--accent);">&#8594;</div>
+            <div>
+              <div class="activity-text"><strong>Routed</strong> sarah.chen to Engineering (payment issue)</div>
+              <div class="activity-time">12 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--red-subtle); color:var(--red);">&#9888;</div>
+            <div>
+              <div class="activity-text"><strong>New cluster</strong> detected: mobile checkout failures</div>
+              <div class="activity-time">18 minutes ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--green-subtle); color:var(--green);">&#10003;</div>
+            <div>
+              <div class="activity-text"><strong>Auto-replied</strong> to dev.tom about Slack integration</div>
+              <div class="activity-time">22 minutes ago</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

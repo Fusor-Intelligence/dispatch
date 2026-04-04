@@ -1,0 +1,39 @@
+import { NextResponse } from 'next/server'
+import { fetchEmails } from '@/lib/gmail'
+import { getDb } from '@/lib/db'
+import { randomUUID } from 'crypto'
+
+export async function POST() {
+  try {
+    const emails = await fetchEmails()
+    const db = getDb()
+
+    const insert = db.prepare(`
+      INSERT OR IGNORE INTO emails (id, gmailId, threadId, "from", subject, body, receivedAt, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
+    `)
+
+    let inserted = 0
+    const insertMany = db.transaction((emails: any[]) => {
+      for (const email of emails) {
+        const result = insert.run(
+          randomUUID(),
+          email.gmailId,
+          email.threadId,
+          email.from,
+          email.subject,
+          email.body,
+          email.receivedAt
+        )
+        if (result.changes > 0) inserted++
+      }
+    })
+
+    insertMany(emails)
+
+    return NextResponse.json({ synced: inserted, total: emails.length })
+  } catch (error: any) {
+    console.error('Sync error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
