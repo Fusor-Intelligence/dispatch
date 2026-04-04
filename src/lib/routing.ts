@@ -18,13 +18,7 @@ export function routeEmail(category: Category, urgency: Urgency, sentiment: Sent
 
 export function determineStatus(
   confidence: number,
-  category?: Category,
-  urgency?: Urgency,
-  sentiment?: Sentiment
 ): 'auto_replied' | 'needs_review' | 'routed' {
-  if (confidence < 0.75) return 'routed'
-  if (urgency === 'critical' || sentiment === 'angry') return 'needs_review'
-  if (category === 'bug_report' && urgency !== 'low') return 'needs_review'
   if (confidence >= 0.9) return 'auto_replied'
   if (confidence >= 0.75) return 'needs_review'
   return 'routed'

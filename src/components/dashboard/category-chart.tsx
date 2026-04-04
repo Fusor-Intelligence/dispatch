@@ -36,18 +36,19 @@ export function CategoryChart({ breakdown, total }: CategoryChartProps) {
   }))
 
   return (
-    <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-5">
-      <div className="text-[13px] font-semibold mb-4">Category Breakdown</div>
-      <div className="h-[160px] relative">
+    <div className="dispatch-panel p-5">
+      <div className="dispatch-kicker mb-2">Mix Analysis</div>
+      <div className="mb-4 text-lg font-semibold text-[#f4efe7]">Category Breakdown</div>
+      <div className="relative h-[190px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={40}
-              outerRadius={70}
-              paddingAngle={2}
+              innerRadius={48}
+              outerRadius={78}
+              paddingAngle={3}
               dataKey="value"
             >
               {data.map((entry, index) => (
@@ -57,14 +58,22 @@ export function CategoryChart({ breakdown, total }: CategoryChartProps) {
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-bold">{total || 0}</span>
+          <div className="text-center">
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[#6f8399]">Total</div>
+            <span className="text-2xl font-semibold text-[#f4efe7]">{total || 0}</span>
+          </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 mt-2">
+      <div className="mt-3 space-y-2">
         {data.map((entry) => (
-          <div key={entry.name} className="flex items-center gap-1 text-[11px] text-[#a0a0b0]">
-            <span className="w-2 h-2 rounded-sm" style={{ background: entry.color }} />
-            {entry.label} ({total ? Math.round((entry.value / total) * 100) : 0}%)
+          <div key={entry.name} className="flex items-center justify-between text-[12px] text-[#a9b8c8]">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: entry.color }} />
+              <span>{entry.label}</span>
+            </div>
+            <span className="font-mono text-[#dce5ee]">
+              {entry.value} · {total ? Math.round((entry.value / total) * 100) : 0}%
+            </span>
           </div>
         ))}
       </div>

@@ -12,11 +12,11 @@ export interface SupportEmail {
   subject: string
   body: string
   receivedAt: string
-  category: Category
-  urgency: Urgency
-  sentiment: Sentiment
+  category: Category | null
+  urgency: Urgency | null
+  sentiment: Sentiment | null
   confidence: number
-  summary: string
+  summary: string | null
   status: EmailStatus
   assignedTo: string | null
   autoReplyDraft: string | null
@@ -52,4 +52,21 @@ export interface DashboardStats {
   categoryBreakdown: Record<Category, number>
   urgencyBreakdown: Record<Urgency, number>
   routingQueue: Record<string, number>
+}
+
+export interface CountRow {
+  count: number
+}
+
+export interface GmailSyncEmail {
+  gmailId: string
+  threadId: string
+  from: string
+  subject: string
+  body: string
+  receivedAt: string
+}
+
+export interface GmailStatus {
+  connected: boolean
 }

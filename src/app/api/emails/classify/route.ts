@@ -33,7 +33,7 @@ export async function POST() {
         continue
       }
 
-      const status = determineStatus(result.confidence, result.category, result.urgency, result.sentiment)
+      const status = determineStatus(result.confidence)
       const assignedTo = status === 'auto_replied'
         ? null
         : routeEmail(result.category, result.urgency, result.sentiment)

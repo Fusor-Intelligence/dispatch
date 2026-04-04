@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodySans = IBM_Plex_Sans({
+  variable: "--font-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const headingSerif = Fraunces({
+  variable: "--font-heading",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const monoFont = IBM_Plex_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -25,9 +32,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${bodySans.variable} ${headingSerif.variable} ${monoFont.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#0a0a0f] text-[#e0e0e8]">{children}</body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 import { google } from 'googleapis'
 import { getDb } from './db'
+import type { SupportEmail } from './types'
 
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.send']
 
@@ -50,6 +51,54 @@ export function getAuthenticatedClient() {
   })
 
   return client
+}
+
+function extractEmailAddress(from: string): string {
+  const match = from.match(/<([^>]+)>/)
+  if (match?.[1]) return match[1].trim()
+  return from.trim()
+}
+
+function toBase64Url(value: string): string {
+  return Buffer.from(value)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '')
+}
+
+export async function createReplyDraft(email: Pick<SupportEmail, 'from' | 'subject' | 'threadId' | 'autoReplyDraft'>) {
+  const draftBody = email.autoReplyDraft?.trim()
+  if (!draftBody) {
+    throw new Error('No draft reply is available for this email')
+  }
+
+  const auth = getAuthenticatedClient()
+  const gmail = google.gmail({ version: 'v1', auth })
+  const recipient = extractEmailAddress(email.from)
+  const subject = email.subject.toLowerCase().startsWith('re:')
+    ? email.subject
+    : `Re: ${email.subject}`
+
+  const mimeMessage = [
+    `To: ${recipient}`,
+    `Subject: ${subject}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    '',
+    draftBody,
+  ].join('\r\n')
+
+  const response = await gmail.users.drafts.create({
+    userId: 'me',
+    requestBody: {
+      message: {
+        threadId: email.threadId,
+        raw: toBase64Url(mimeMessage),
+      },
+    },
+  })
+
+  return response.data.id || null
 }
 
 export async function fetchEmails(maxResults: number = 50) {

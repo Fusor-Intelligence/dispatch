@@ -1,7 +1,5 @@
 'use client'
 
-import { BarChart, Bar, XAxis, ResponsiveContainer, Cell } from 'recharts'
-
 const COLORS: Record<string, string> = {
   low: '#6b6b80',
   medium: '#eab308',
@@ -21,26 +19,30 @@ export function UrgencyChart({ breakdown }: UrgencyChartProps) {
     value: breakdown[key] || 0,
     color: COLORS[key],
   }))
+  const maxValue = Math.max(...data.map((item) => item.value), 1)
 
   return (
-    <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-5">
-      <div className="text-[13px] font-semibold mb-4">Urgency Distribution</div>
-      <div className="h-[120px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <XAxis
-              dataKey="name"
-              tick={{ fill: '#6b6b80', fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+    <div className="dispatch-panel p-5">
+      <div className="dispatch-kicker mb-2">Risk Profile</div>
+      <div className="mb-4 text-lg font-semibold text-[#f4efe7]">Urgency Distribution</div>
+      <div className="space-y-3">
+        {data.map((entry) => (
+          <div key={entry.name}>
+            <div className="mb-1 flex items-center justify-between text-xs text-[#a9b8c8]">
+              <span>{entry.name}</span>
+              <span className="font-mono text-[#dce5ee]">{entry.value}</span>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)]">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${Math.max((entry.value / maxValue) * 100, entry.value > 0 ? 10 : 0)}%`,
+                  background: entry.color,
+                }}
+              />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

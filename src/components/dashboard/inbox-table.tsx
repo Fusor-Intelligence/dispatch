@@ -1,5 +1,7 @@
 'use client'
 
+import type { SupportEmail } from '@/lib/types'
+
 const CATEGORY_STYLES: Record<string, { bg: string; text: string }> = {
   refund: { bg: '#1e1e3e', text: '#818cf8' },
   bug_report: { bg: '#2a1a1a', text: '#f87171' },
@@ -48,27 +50,31 @@ const FILTERS = [
 ]
 
 interface InboxTableProps {
-  emails: any[]
-  selectedEmail: any
-  onSelectEmail: (email: any) => void
+  emails: SupportEmail[]
+  selectedEmail: SupportEmail | null
+  onSelectEmail: (email: SupportEmail | null) => void
   statusFilter: string
   onFilterChange: (filter: string) => void
 }
 
 export function InboxTable({ emails, selectedEmail, onSelectEmail, statusFilter, onFilterChange }: InboxTableProps) {
   return (
-    <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-[#1e1e2e] flex justify-between items-center">
-        <span className="text-sm font-semibold">Inbox ({emails.length} emails)</span>
-        <div className="flex gap-2">
+    <div className="dispatch-panel overflow-hidden">
+      <div className="flex flex-col gap-4 border-b border-[rgba(255,255,255,0.08)] px-5 py-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="dispatch-kicker mb-2">Triage Queue</div>
+          <div className="text-xl font-semibold text-[#f4efe7]">Inbox</div>
+          <div className="mt-1 text-sm text-[#94a3b8]">{emails.length} emails in the current view.</div>
+        </div>
+        <div className="flex flex-wrap gap-2">
           {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => onFilterChange(f.key)}
-              className={`text-[11px] px-2.5 py-1 rounded-xl cursor-pointer transition-colors ${
+              className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition-colors ${
                 statusFilter === f.key
-                  ? 'bg-[#6366f1] text-white'
-                  : 'bg-[#1e1e2e] text-[#a0a0b0] hover:bg-[#2a2a3a]'
+                  ? 'border-[rgba(243,179,107,0.38)] bg-[rgba(243,179,107,0.15)] text-[#ffdcb3]'
+                  : 'border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)] text-[#9fb0c5] hover:bg-[rgba(255,255,255,0.06)]'
               }`}
             >
               {f.label}
@@ -77,9 +83,8 @@ export function InboxTable({ emails, selectedEmail, onSelectEmail, statusFilter,
         </div>
       </div>
 
-      {/* Column headers */}
-      <div className="grid grid-cols-[32px_1fr_80px_70px_80px_90px] items-center px-5 py-2.5 text-[11px] text-[#4a4a5a] border-b border-[#1e1e2e] font-semibold gap-3">
-        <span></span>
+      <div className="grid grid-cols-[44px_minmax(0,1.4fr)_100px_92px_86px_110px] items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#66788e]">
+        <span>Urgency</span>
         <span>From / Subject</span>
         <span>Category</span>
         <span>Sentiment</span>
@@ -88,14 +93,14 @@ export function InboxTable({ emails, selectedEmail, onSelectEmail, statusFilter,
       </div>
 
       {emails.length === 0 ? (
-        <div className="px-5 py-8 text-center text-[#6b6b80] text-sm">
+        <div className="px-5 py-10 text-center text-sm text-[#8ea0b5]">
           No emails found. Click &quot;Sync Inbox&quot; to load data.
         </div>
       ) : (
         emails.map((email) => {
-          const urgencyColor = URGENCY_COLORS[email.urgency] || URGENCY_COLORS.low
-          const catStyle = CATEGORY_STYLES[email.category] || CATEGORY_STYLES.general_inquiry
-          const sentColor = SENTIMENT_COLORS[email.sentiment] || SENTIMENT_COLORS.neutral
+          const urgencyColor = email.urgency ? (URGENCY_COLORS[email.urgency] || URGENCY_COLORS.low) : URGENCY_COLORS.low
+          const catStyle = email.category ? (CATEGORY_STYLES[email.category] || CATEGORY_STYLES.general_inquiry) : CATEGORY_STYLES.general_inquiry
+          const sentColor = email.sentiment ? (SENTIMENT_COLORS[email.sentiment] || SENTIMENT_COLORS.neutral) : SENTIMENT_COLORS.neutral
           const statusStyle = STATUS_STYLES[email.status] || STATUS_STYLES.new
           const isSelected = selectedEmail?.id === email.id
 
@@ -103,37 +108,52 @@ export function InboxTable({ emails, selectedEmail, onSelectEmail, statusFilter,
             <div
               key={email.id}
               onClick={() => onSelectEmail(isSelected ? null : email)}
-              className={`grid grid-cols-[32px_1fr_80px_70px_80px_90px] items-center px-5 py-3 border-b border-[#1a1a24] text-[13px] gap-3 cursor-pointer transition-colors ${
-                isSelected ? 'bg-[#1a1a2e]' : 'hover:bg-[#16161f]'
+              className={`grid grid-cols-[44px_minmax(0,1.4fr)_100px_92px_86px_110px] items-center gap-3 border-b border-[rgba(255,255,255,0.05)] px-5 py-4 text-[13px] transition-colors ${
+                isSelected
+                  ? 'bg-[linear-gradient(90deg,_rgba(243,179,107,0.10),_rgba(255,255,255,0.03))]'
+                  : 'cursor-pointer hover:bg-[rgba(255,255,255,0.035)]'
               }`}
             >
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{
-                  background: urgencyColor,
-                  boxShadow: email.urgency === 'critical' ? `0 0 6px ${urgencyColor}66` : 'none',
-                }}
-              />
+              <div className="flex flex-col items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-[#74869b]">
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{
+                    background: urgencyColor,
+                    boxShadow: email.urgency === 'critical' ? `0 0 10px ${urgencyColor}66` : 'none',
+                  }}
+                />
+                <span>{email.urgency || 'new'}</span>
+              </div>
               <div className="overflow-hidden">
-                <div className="font-medium text-[13px]">{email.from}</div>
-                <div className="text-[#6b6b80] text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+                <div className="flex items-center gap-2 text-[13px]">
+                  <span className="font-medium text-[#f4efe7]">{email.from}</span>
+                  {email.assignedTo && (
+                    <span className="rounded-full border border-[rgba(255,255,255,0.08)] px-2 py-0.5 text-[10px] text-[#93a6bb]">
+                      {email.assignedTo}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 whitespace-nowrap overflow-hidden text-ellipsis text-xs text-[#dce4ec]">
                   {email.subject}
+                </div>
+                <div className="mt-1 whitespace-nowrap overflow-hidden text-ellipsis text-xs text-[#71839a]">
+                  {email.summary || 'Awaiting AI summary.'}
                 </div>
               </div>
               <span
-                className="text-[10px] px-2 py-0.5 rounded uppercase font-semibold"
+                className="rounded-full px-2.5 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]"
                 style={{ background: catStyle.bg, color: catStyle.text }}
               >
-                {CATEGORY_LABELS[email.category] || email.category}
+                {email.category ? (CATEGORY_LABELS[email.category] || email.category) : 'Pending'}
               </span>
-              <span className="text-[11px] capitalize" style={{ color: sentColor }}>
-                {email.sentiment}
+              <span className="text-[11px] capitalize font-medium" style={{ color: sentColor }}>
+                {email.sentiment || 'pending'}
               </span>
-              <span className="text-[#6b6b80]">
+              <span className="font-mono text-[#9fb0c5]">
                 {Math.round((email.confidence || 0) * 100)}%
               </span>
               <span
-                className="text-[10px] px-2 py-1 rounded text-center"
+                className="rounded-full px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em]"
                 style={{ background: statusStyle.bg, color: statusStyle.text }}
               >
                 {statusStyle.label}

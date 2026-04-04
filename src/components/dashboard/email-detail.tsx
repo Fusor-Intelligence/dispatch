@@ -1,5 +1,7 @@
 'use client'
 
+import type { SupportEmail } from '@/lib/types'
+
 const CATEGORY_LABELS: Record<string, string> = {
   refund: 'Refund',
   bug_report: 'Bug Report',
@@ -10,94 +12,101 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 interface EmailDetailProps {
-  email: any
+  email: SupportEmail
   onClose: () => void
   onApprove: (id: string) => void
+  approving: boolean
+  gmailConnected: boolean
 }
 
-export function EmailDetail({ email, onClose, onApprove }: EmailDetailProps) {
+export function EmailDetail({ email, onClose, onApprove, approving, gmailConnected }: EmailDetailProps) {
   return (
-    <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl mt-4 overflow-hidden">
-      <div className="px-5 py-4 border-b border-[#1e1e2e] flex justify-between items-center">
-        <span className="text-sm font-semibold">Email Detail</span>
+    <div className="dispatch-panel mt-4 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-5 py-4">
+        <div>
+          <div className="dispatch-kicker mb-1">Case Review</div>
+          <span className="text-sm font-semibold text-[#f4efe7]">Email Detail</span>
+        </div>
         <button
           onClick={onClose}
-          className="text-[#6b6b80] hover:text-white text-sm cursor-pointer"
+          className="rounded-full border border-[rgba(255,255,255,0.08)] px-3 py-1 text-sm text-[#9fb0c5] transition hover:bg-[rgba(255,255,255,0.05)] hover:text-white"
         >
           Close
         </button>
       </div>
 
-      <div className="p-5 space-y-4">
-        {/* Email header */}
-        <div>
-          <div className="text-sm font-medium">{email.subject}</div>
-          <div className="text-xs text-[#6b6b80] mt-1">
+      <div className="space-y-4 p-5">
+        <div className="rounded-[24px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-4">
+          <div className="text-lg font-semibold text-[#f4efe7]">{email.subject}</div>
+          <div className="mt-2 text-xs text-[#8ea0b5]">
             From: {email.from} &middot; {new Date(email.receivedAt).toLocaleString()}
           </div>
         </div>
 
-        {/* AI Analysis */}
-        <div className="bg-[#0a0a0f] rounded-lg p-4 space-y-3">
-          <div className="text-xs font-semibold text-[#6366f1] uppercase tracking-wider">
+        <div className="rounded-[24px] border border-[rgba(255,255,255,0.07)] bg-[rgba(8,14,21,0.65)] p-4">
+          <div className="dispatch-kicker mb-3 text-[#7ea8d9]">
             AI Analysis
           </div>
-          <div className="grid grid-cols-4 gap-4 text-xs">
+          <div className="grid gap-3 text-xs sm:grid-cols-2 xl:grid-cols-4">
             <div>
-              <div className="text-[#6b6b80] mb-1">Category</div>
-              <div className="font-medium">{CATEGORY_LABELS[email.category] || email.category}</div>
+              <div className="mb-1 text-[#72859b]">Category</div>
+              <div className="font-medium text-[#f4efe7]">{email.category ? (CATEGORY_LABELS[email.category] || email.category) : 'Pending classification'}</div>
             </div>
             <div>
-              <div className="text-[#6b6b80] mb-1">Urgency</div>
-              <div className="font-medium capitalize">{email.urgency}</div>
+              <div className="mb-1 text-[#72859b]">Urgency</div>
+              <div className="font-medium capitalize text-[#f4efe7]">{email.urgency || 'pending'}</div>
             </div>
             <div>
-              <div className="text-[#6b6b80] mb-1">Sentiment</div>
-              <div className="font-medium capitalize">{email.sentiment}</div>
+              <div className="mb-1 text-[#72859b]">Sentiment</div>
+              <div className="font-medium capitalize text-[#f4efe7]">{email.sentiment || 'pending'}</div>
             </div>
             <div>
-              <div className="text-[#6b6b80] mb-1">Confidence</div>
-              <div className="font-medium">{Math.round((email.confidence || 0) * 100)}%</div>
+              <div className="mb-1 text-[#72859b]">Confidence</div>
+              <div className="font-medium text-[#f4efe7]">{Math.round((email.confidence || 0) * 100)}%</div>
             </div>
           </div>
-          <div>
-            <div className="text-[#6b6b80] text-xs mb-1">Summary</div>
-            <div className="text-xs">{email.summary}</div>
+          <div className="mt-4">
+            <div className="mb-1 text-xs text-[#72859b]">Summary</div>
+            <div className="text-sm leading-6 text-[#d8e1ea]">{email.summary || 'Pending AI analysis.'}</div>
           </div>
           {email.assignedTo && (
-            <div>
-              <div className="text-[#6b6b80] text-xs mb-1">Routed To</div>
-              <div className="text-xs font-medium text-[#818cf8]">{email.assignedTo}</div>
+            <div className="mt-4">
+              <div className="mb-1 text-xs text-[#72859b]">Routed To</div>
+              <div className="text-sm font-medium text-[#9bc2f2]">{email.assignedTo}</div>
             </div>
           )}
         </div>
 
-        {/* Original email body */}
         <div>
-          <div className="text-xs font-semibold text-[#6b6b80] uppercase tracking-wider mb-2">
+          <div className="dispatch-kicker mb-2">
             Original Email
           </div>
-          <div className="text-xs text-[#a0a0b0] whitespace-pre-wrap leading-relaxed bg-[#0a0a0f] rounded-lg p-4">
+          <div className="rounded-[24px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.03)] p-4 text-sm leading-7 whitespace-pre-wrap text-[#d8e1ea]">
             {email.body}
           </div>
         </div>
 
-        {/* Auto-reply draft */}
         {email.autoReplyDraft && (
           <div>
-            <div className="text-xs font-semibold text-[#4ade80] uppercase tracking-wider mb-2">
+            <div className="dispatch-kicker mb-2 text-[#90e5ac]">
               AI Draft Reply
             </div>
-            <div className="text-xs text-[#a0a0b0] whitespace-pre-wrap leading-relaxed bg-[#0a1a0a] border border-[#1a3a1a] rounded-lg p-4">
+            <div className="rounded-[24px] border border-[#264731] bg-[linear-gradient(180deg,_rgba(12,30,20,0.94),_rgba(8,19,14,0.92))] p-4 text-sm leading-7 whitespace-pre-wrap text-[#d8e1ea]">
               {email.autoReplyDraft}
             </div>
-            {(email.status === 'needs_review' || email.status === 'auto_replied') && email.status !== 'resolved' && (
+            {(email.status === 'needs_review' || email.status === 'auto_replied') && (
               <button
                 onClick={() => onApprove(email.id)}
-                className="mt-3 bg-[#4ade80] text-[#0a0a0f] px-4 py-2 rounded-md text-xs font-semibold cursor-pointer hover:bg-[#3bca71] transition-colors"
+                disabled={approving || !gmailConnected}
+                className="mt-3 rounded-full border border-[#327b52] bg-[#79d99c] px-4 py-2 text-xs font-semibold text-[#0b160f] transition hover:bg-[#8fe3ad] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Approve & Send
+                {approving ? 'Creating Gmail Draft...' : 'Approve & Create Gmail Draft'}
               </button>
+            )}
+            {!gmailConnected && (email.status === 'needs_review' || email.status === 'auto_replied') && (
+              <div className="mt-2 text-[11px] text-[#f6c67d]">
+                Connect Gmail to create a draft instead of sending live mail.
+              </div>
             )}
           </div>
         )}

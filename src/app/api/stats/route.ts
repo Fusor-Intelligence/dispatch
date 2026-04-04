@@ -1,29 +1,42 @@
 import { NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
+import type { Category, CountRow, DashboardStats, Urgency } from '@/lib/types'
 
 export async function GET() {
   const db = getDb()
 
-  const totalEmails = (db.prepare('SELECT COUNT(*) as count FROM emails').get() as any).count
-  const autoResolved = (db.prepare("SELECT COUNT(*) as count FROM emails WHERE status IN ('auto_replied', 'resolved')").get() as any).count
-  const openIssues = (db.prepare("SELECT COUNT(*) as count FROM clusters WHERE severity IN ('high', 'critical')").get() as any).count
+  const totalEmails = (db.prepare('SELECT COUNT(*) as count FROM emails').get() as CountRow).count
+  const autoResolved = (db.prepare("SELECT COUNT(*) as count FROM emails WHERE status IN ('auto_replied', 'resolved')").get() as CountRow).count
+  const openIssues = (db.prepare("SELECT COUNT(*) as count FROM clusters WHERE severity IN ('high', 'critical')").get() as CountRow).count
 
   const categoryRows = db.prepare(
     'SELECT category, COUNT(*) as count FROM emails WHERE category IS NOT NULL GROUP BY category'
-  ).all() as { category: string; count: number }[]
+  ).all() as { category: Category; count: number }[]
 
   const urgencyRows = db.prepare(
     'SELECT urgency, COUNT(*) as count FROM emails WHERE urgency IS NOT NULL GROUP BY urgency'
-  ).all() as { urgency: string; count: number }[]
+  ).all() as { urgency: Urgency; count: number }[]
 
   const routingRows = db.prepare(
     'SELECT assignedTo, COUNT(*) as count FROM emails WHERE assignedTo IS NOT NULL GROUP BY assignedTo'
   ).all() as { assignedTo: string; count: number }[]
 
-  const categoryBreakdown: Record<string, number> = {}
+  const categoryBreakdown: DashboardStats['categoryBreakdown'] = {
+    refund: 0,
+    cancellation: 0,
+    bug_report: 0,
+    feature_request: 0,
+    general_inquiry: 0,
+    complaint: 0,
+  }
   for (const row of categoryRows) categoryBreakdown[row.category] = row.count
 
-  const urgencyBreakdown: Record<string, number> = {}
+  const urgencyBreakdown: DashboardStats['urgencyBreakdown'] = {
+    low: 0,
+    medium: 0,
+    high: 0,
+    critical: 0,
+  }
   for (const row of urgencyRows) urgencyBreakdown[row.urgency] = row.count
 
   const routingQueue: Record<string, number> = {}

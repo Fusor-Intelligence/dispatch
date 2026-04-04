@@ -1,12 +1,9 @@
 'use client'
 
+import type { DashboardStats } from '@/lib/types'
+
 interface StatsCardsProps {
-  stats: {
-    totalEmails: number
-    autoResolved: number
-    avgResponseTime: number
-    openIssues: number
-  } | null
+  stats: DashboardStats | null
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
@@ -16,48 +13,66 @@ export function StatsCards({ stats }: StatsCardsProps) {
     {
       label: 'Total Emails',
       value: stats.totalEmails,
-      color: '#a78bfa',
+      color: '#f7cf9a',
       trend: `+${Math.floor(stats.totalEmails * 0.25)} today`,
-      trendUp: true,
+      accent: 'rgba(243,179,107,0.24)',
     },
     {
       label: 'Auto-Resolved',
       value: stats.autoResolved,
-      color: '#4ade80',
+      color: '#8ce7b1',
       trend: `${stats.totalEmails > 0 ? Math.round((stats.autoResolved / stats.totalEmails) * 100) : 0}% resolution rate`,
-      trendUp: true,
+      accent: 'rgba(74,222,128,0.2)',
     },
     {
       label: 'Avg Response',
       value: `${stats.avgResponseTime}s`,
-      color: '#60a5fa',
+      color: '#91c8ff',
       trend: 'vs 4.2h industry avg',
-      trendUp: true,
+      accent: 'rgba(96,165,250,0.18)',
     },
     {
       label: 'Open Issues',
       value: stats.openIssues,
-      color: '#fb923c',
+      color: '#f8a88f',
       trend: `${stats.openIssues} critical clusters`,
-      trendUp: false,
+      accent: 'rgba(248,117,92,0.18)',
     },
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-4 mb-6">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-5"
+          className="dispatch-panel relative overflow-hidden p-5"
         >
-          <div className="text-xs text-[#6b6b80] uppercase tracking-wider mb-2">
-            {card.label}
-          </div>
-          <div className="text-3xl font-bold" style={{ color: card.color }}>
-            {card.value}
-          </div>
-          <div className={`text-xs mt-1 ${card.trendUp ? 'text-[#4ade80]' : 'text-[#f87171]'}`}>
-            {card.trend}
+          <div
+            className="absolute inset-x-0 top-0 h-20"
+            style={{ background: `linear-gradient(180deg, ${card.accent}, transparent)` }}
+          />
+          <div className="relative">
+            <div className="dispatch-kicker mb-3">{card.label}</div>
+            <div className="mb-2 text-4xl font-semibold tracking-tight" style={{ color: card.color }}>
+              {card.value}
+            </div>
+            <div className="text-sm text-[#9fb0c5]">{card.trend}</div>
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    card.label === 'Avg Response'
+                      ? 82
+                      : typeof card.value === 'number'
+                        ? Math.max(16, Math.min(card.value * 8, 100))
+                        : 72
+                  )}%`,
+                  background: card.color,
+                }}
+              />
+            </div>
           </div>
         </div>
       ))}
