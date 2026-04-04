@@ -27,7 +27,7 @@ export function Header({ stats, gmailConnected, syncing, onSync, onConnect, onLo
               D
             </div>
             <div className="space-y-2">
-              <div className="font-heading text-4xl leading-none text-[#f6f1e8] sm:text-5xl">
+              <div className="text-4xl leading-none text-[#f6f1e8] sm:text-5xl">
                 Dispatch
               </div>
               <p className="max-w-2xl text-sm leading-6 text-[#a8b7c8] sm:text-[15px]">

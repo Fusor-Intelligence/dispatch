@@ -37,9 +37,9 @@ export function BottomNav() {
           height: '48px',
           borderRadius: '9999px',
           background: 'rgba(10, 10, 10, 0.92)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(20px)',
-          boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 24px 48px rgba(0,0,0,0.6)',
+          boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 24px 48px rgba(0,0,0,0.6)',
         }}
       >
         {/* Left: Wordmark */}
@@ -50,7 +50,7 @@ export function BottomNav() {
             fontSize: '9px',
             fontWeight: 700,
             letterSpacing: '0.2em',
-            color: 'rgba(255,255,255,0.25)',
+            color: 'rgba(255,255,255,0.2)',
             textTransform: 'uppercase',
             minWidth: '52px',
           }}
@@ -77,7 +77,7 @@ export function BottomNav() {
                 style={{
                   padding: '6px 10px',
                   borderRadius: '9999px',
-                  background: isActive ? 'rgba(243, 179, 107, 0.1)' : 'transparent',
+                  background: isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
                   transition: 'background 0.2s ease, opacity 0.2s ease',
                   cursor: isReachable ? 'pointer' : 'default',
                   border: 'none',
@@ -88,7 +88,7 @@ export function BottomNav() {
                 <Icon
                   size={16}
                   style={{
-                    color: isActive ? '#f3b36b' : 'rgba(255,255,255,0.3)',
+                    color: isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.28)',
                     transition: 'color 0.2s ease',
                     strokeWidth: isActive ? 2 : 1.5,
                   }}
@@ -103,7 +103,7 @@ export function BottomNav() {
                       width: '4px',
                       height: '2px',
                       borderRadius: '9999px',
-                      background: '#f3b36b',
+                      background: 'rgba(255,255,255,0.7)',
                     }}
                   />
                 )}
@@ -123,7 +123,7 @@ export function BottomNav() {
             fontSize: '9px',
             fontWeight: 600,
             letterSpacing: '0.3em',
-            color: 'rgba(255,255,255,0.35)',
+            color: 'rgba(255,255,255,0.3)',
             textTransform: 'uppercase',
             minWidth: '60px',
             opacity: labelVisible ? 1 : 0,

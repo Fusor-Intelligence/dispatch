@@ -8,6 +8,33 @@ import { cn } from '@/lib/utils'
 
 const ICONS: Record<string, typeof Zap> = { Zap, MessageSquare, AlertTriangle, Layers }
 
+const TOP_BAR: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  height: '56px',
+  padding: '0 24px',
+  borderBottom: '1px solid rgba(255,255,255,0.06)',
+  flexShrink: 0,
+}
+
+const WORDMARK: React.CSSProperties = {
+  fontFamily: "'Apparat', system-ui, sans-serif",
+  fontSize: '28px',
+  fontWeight: 700,
+  letterSpacing: '-0.03em',
+  color: 'rgba(255,255,255,0.85)',
+}
+
+const STATUS_LABEL: React.CSSProperties = {
+  fontFamily: "'Apparat', system-ui, sans-serif",
+  fontSize: '9px',
+  fontWeight: 600,
+  letterSpacing: '0.3em',
+  textTransform: 'uppercase' as const,
+  color: 'rgba(255,255,255,0.2)',
+}
+
 export function DeployScreen() {
   const {
     missionPresets,
@@ -47,148 +74,313 @@ export function DeployScreen() {
   }
 
   return (
-    <ScreenShell className="flex items-center justify-center px-8">
-      <div className="grid w-full max-w-[1320px] gap-12 xl:grid-cols-[1fr_1.25fr] xl:items-center">
-        {/* Left: Brand */}
-        <div className="space-y-6">
-          <div className="dispatch-kicker">Mission Briefing</div>
-          <div className="flex items-start gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.6rem] border border-[rgba(243,179,107,0.25)] bg-[linear-gradient(180deg,_rgba(243,179,107,0.22),_rgba(243,179,107,0.08))] text-3xl font-semibold text-[#ffd8ac] shadow-[0_14px_30px_rgba(243,179,107,0.12)]">
-              D
+    <ScreenShell className="flex flex-col overflow-hidden">
+      {/* ── Top bar ── */}
+      <div style={TOP_BAR}>
+        <div style={WORDMARK}>Dispatch</div>
+        <div style={STATUS_LABEL}>Configure</div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-8 py-10">
+        <div className="grid w-full max-w-[1320px] gap-12 xl:grid-cols-[1fr_1.25fr] xl:items-center">
+
+          {/* Left: Brand */}
+          <div className="space-y-6">
+            {/* Kicker */}
+            <div style={{
+              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontSize: '9px',
+              fontWeight: 600,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.2)',
+            }}>
+              Mission Briefing
             </div>
-            <div>
-              <h1 className="font-heading text-5xl leading-none text-[#f6f1e8] sm:text-6xl">
-                Dispatch
-              </h1>
-              <p className="mt-3 max-w-md text-[15px] leading-7 text-[#a8b7c8]">
-                Assign an AI operator to your support inbox. It reads, triages,
-                drafts replies, and surfaces the issues that matter — you approve
-                the decisions.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2.5">
-            <span className="dispatch-pill">
-              <span className={`h-2 w-2 rounded-full ${gmailConnected ? 'bg-[#6ee7b7]' : 'bg-[#fb923c]'}`} />
-              {gmailConnected ? 'Gmail linked' : 'Gmail not connected'}
-            </span>
-          </div>
-        </div>
 
-        {/* Right: Mission Config */}
-        <div className="space-y-5">
-          {/* Prompt card */}
-          <div className="dispatch-panel-strong p-6">
-            <div className="text-lg font-semibold text-[#f4efe7]">Connect your support inbox</div>
-            <p className="mt-1 text-sm text-[#8ea0b5]">
-              Choose a mission profile and Dispatch will begin investigating.
-            </p>
-          </div>
-
-          {/* Mission presets */}
-          <div className="grid grid-cols-2 gap-3">
-            {missionPresets.map((preset) => {
-              const Icon = ICONS[preset.icon] || Zap
-              return (
-                <button
-                  key={preset.id}
-                  onClick={() => togglePreset(preset.id)}
-                  className={cn(
-                    'dispatch-panel p-4 text-left transition-all',
-                    preset.selected
-                      ? 'border-[rgba(243,179,107,0.35)] shadow-[0_0_24px_rgba(243,179,107,0.08)]'
-                      : 'hover:border-[rgba(255,255,255,0.14)]'
-                  )}
-                >
-                  <Icon
-                    size={20}
-                    className={cn(
-                      'mb-2',
-                      preset.selected ? 'text-[#f3b36b]' : 'text-[#6c7d92]'
-                    )}
-                  />
-                  <div className="text-sm font-semibold text-[#f4efe7]">{preset.label}</div>
-                  <div className="mt-1 text-xs text-[#8ea0b5]">{preset.description}</div>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Guardrails */}
-          <div className="dispatch-panel space-y-0 divide-y divide-[rgba(255,255,255,0.06)] px-5">
-            {guardrails.map((g) => (
-              <button
-                key={g.id}
-                onClick={() => toggleGuardrail(g.id)}
-                className="flex w-full items-center justify-between py-3.5 text-left"
-              >
-                <span className="text-sm text-[#d8e1ea]">{g.label}</span>
-                <span
-                  className={cn(
-                    'relative h-5 w-9 rounded-full transition-colors',
-                    g.enabled ? 'bg-[#f3b36b]' : 'bg-[rgba(255,255,255,0.12)]'
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform',
-                      g.enabled ? 'translate-x-4' : 'translate-x-0.5'
-                    )}
-                  />
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* CTAs */}
-          <div className="flex items-center justify-between gap-3 pt-1">
-            {!gmailConnected ? (
-              <button
-                onClick={handleConnectGmail}
-                className="rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] px-5 py-3 text-sm text-[#9fb0c5] transition hover:bg-[rgba(255,255,255,0.06)]"
-              >
-                Connect Gmail
-              </button>
-            ) : (
-              <button
-                onClick={handleStartDemo}
-                className="rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] px-5 py-3 text-sm text-[#9fb0c5] transition hover:bg-[rgba(255,255,255,0.06)]"
-              >
-                Use Demo Data
-              </button>
-            )}
-            <button
-              onClick={handleStartSweep}
-              style={{
+            {/* Brand lockup */}
+            <div className="flex items-start gap-5">
+              {/* D icon */}
+              <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '14px 32px',
-                borderRadius: '9999px',
-                background: '#f3b36b',
-                color: '#0A0A0A',
+                justifyContent: 'center',
+                height: '64px',
+                width: '64px',
+                flexShrink: 0,
+                borderRadius: '1.6rem',
+                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(255,255,255,0.06)',
                 fontFamily: "'Apparat', system-ui, sans-serif",
-                fontSize: '13px',
+                fontSize: '28px',
                 fontWeight: 600,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'filter 0.375s ease, transform 0.375s cubic-bezier(0, .55, .45, 1)',
-                boxShadow: '0 8px 32px rgba(243, 179, 107, 0.3)',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.02)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1)';
-                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-              }}
-            >
-              <Zap size={15} />
-              Launch Sweep
-            </button>
+                color: 'rgba(255,255,255,0.82)',
+              }}>
+                D
+              </div>
+
+              <div>
+                <h1 style={{
+                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontSize: '56px',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
+                  color: 'rgba(255,255,255,0.85)',
+                }}>
+                  Dispatch
+                </h1>
+                <p style={{
+                  marginTop: '12px',
+                  maxWidth: '420px',
+                  fontSize: '15px',
+                  lineHeight: 1.75,
+                  color: 'rgba(255,255,255,0.45)',
+                  fontFamily: "'Apparat', system-ui, sans-serif",
+                }}>
+                  Assign an AI operator to your support inbox. It reads, triages,
+                  drafts replies, and surfaces the issues that matter — you approve
+                  the decisions.
+                </p>
+              </div>
+            </div>
+
+            {/* Gmail status pill */}
+            <div className="flex flex-wrap gap-2.5">
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '7px',
+                padding: '5px 12px',
+                borderRadius: '9999px',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.04)',
+                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontSize: '11px',
+                letterSpacing: '0.06em',
+                color: 'rgba(255,255,255,0.45)',
+              }}>
+                <span style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '9999px',
+                  background: gmailConnected ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)',
+                  flexShrink: 0,
+                }} />
+                {gmailConnected ? 'Gmail linked' : 'Gmail not connected'}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Mission Config */}
+          <div className="space-y-5">
+            {/* Connect inbox card */}
+            <div style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+              padding: '24px',
+            }}>
+              <div style={{
+                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontSize: '17px',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.82)',
+              }}>
+                Connect your support inbox
+              </div>
+              <p style={{
+                marginTop: '4px',
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.35)',
+                fontFamily: "'Apparat', system-ui, sans-serif",
+              }}>
+                Choose a mission profile and Dispatch will begin investigating.
+              </p>
+            </div>
+
+            {/* Mission presets */}
+            <div className="grid grid-cols-2 gap-3">
+              {missionPresets.map((preset) => {
+                const Icon = ICONS[preset.icon] || Zap
+                return (
+                  <button
+                    key={preset.id}
+                    onClick={() => togglePreset(preset.id)}
+                    style={{
+                      background: preset.selected ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${preset.selected ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: '14px',
+                      padding: '16px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s ease, border-color 0.15s ease',
+                      fontFamily: "'Apparat', system-ui, sans-serif",
+                    }}
+                  >
+                    <Icon
+                      size={20}
+                      style={{
+                        marginBottom: '8px',
+                        color: preset.selected ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
+                        transition: 'color 0.15s ease',
+                      }}
+                    />
+                    <div style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.82)',
+                    }}>
+                      {preset.label}
+                    </div>
+                    <div style={{
+                      marginTop: '3px',
+                      fontSize: '11px',
+                      color: 'rgba(255,255,255,0.35)',
+                    }}>
+                      {preset.description}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Guardrails */}
+            <div style={{ borderRadius: '14px' }}>
+              {guardrails.map((g, i) => (
+                <button
+                  key={g.id}
+                  onClick={() => toggleGuardrail(g.id)}
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 0',
+                    borderBottom: i < guardrails.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottomColor: i < guardrails.length - 1 ? 'rgba(255,255,255,0.06)' : undefined,
+                    borderBottomStyle: i < guardrails.length - 1 ? 'solid' : undefined,
+                    borderBottomWidth: i < guardrails.length - 1 ? '1px' : undefined,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontFamily: "'Apparat', system-ui, sans-serif",
+                  }}
+                >
+                  <span style={{
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}>
+                    {g.label}
+                  </span>
+                  {/* Toggle */}
+                  <span style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    height: '20px',
+                    width: '36px',
+                    borderRadius: '9999px',
+                    background: g.enabled ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.12)',
+                    transition: 'background 0.2s ease',
+                    flexShrink: 0,
+                  }}>
+                    <span style={{
+                      position: 'absolute',
+                      top: '2px',
+                      left: g.enabled ? '16px' : '2px',
+                      height: '16px',
+                      width: '16px',
+                      borderRadius: '9999px',
+                      background: '#0A0A0A',
+                      transition: 'left 0.2s ease',
+                    }} />
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+              paddingTop: '4px',
+            }}>
+              {!gmailConnected ? (
+                <button
+                  onClick={handleConnectGmail}
+                  style={{
+                    borderRadius: '9999px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'transparent',
+                    padding: '12px 20px',
+                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.4)',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+                >
+                  Connect Gmail
+                </button>
+              ) : (
+                <button
+                  onClick={handleStartDemo}
+                  style={{
+                    borderRadius: '9999px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'transparent',
+                    padding: '12px 20px',
+                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.4)',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s ease',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+                >
+                  Use Demo Data
+                </button>
+              )}
+
+              <button
+                onClick={handleStartSweep}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 32px',
+                  borderRadius: '9999px',
+                  background: '#fff',
+                  color: '#0A0A0A',
+                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'filter 0.2s ease, transform 0.2s cubic-bezier(0, .55, .45, 1)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(0.92)';
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.02)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1)';
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+                }}
+              >
+                <Zap size={15} />
+                Launch Sweep
+              </button>
+            </div>
           </div>
         </div>
       </div>
