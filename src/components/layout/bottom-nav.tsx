@@ -46,7 +46,7 @@ export function BottomNav() {
         <div
           className="px-2 select-none"
           style={{
-            fontFamily: "'Apparat', system-ui, sans-serif",
+            fontFamily: "'KMR Apparat', system-ui, sans-serif",
             fontSize: '9px',
             fontWeight: 700,
             letterSpacing: '0.2em',
@@ -119,7 +119,7 @@ export function BottomNav() {
         <div
           className="px-2 select-none"
           style={{
-            fontFamily: "'Apparat', system-ui, sans-serif",
+            fontFamily: "'KMR Apparat', system-ui, sans-serif",
             fontSize: '9px',
             fontWeight: 600,
             letterSpacing: '0.3em',

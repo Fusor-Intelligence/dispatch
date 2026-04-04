@@ -1,6 +1,7 @@
 'use client'
 
 import { ScreenShell } from '@/components/layout/screen-shell'
+import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { CheckCircle, AlertTriangle, Layers, ArrowRight } from 'lucide-react'
 
@@ -26,38 +27,11 @@ export function BriefScreen() {
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
       {/* ── Top bar ── */}
-      <div
-        className="flex shrink-0 items-center justify-between px-6"
-        style={{ height: '56px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        <div
-          style={{
-            fontFamily: "'Apparat', system-ui, sans-serif",
-            fontSize: '28px',
-            fontWeight: 700,
-            letterSpacing: '-0.03em',
-            color: 'rgba(255,255,255,0.85)',
-          }}
-        >
-          Dispatch
-        </div>
-        <div
-          style={{
-            fontFamily: "'Apparat', system-ui, sans-serif",
-            fontSize: '9px',
-            fontWeight: 500,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.25)',
-          }}
-        >
-          Brief
-        </div>
-      </div>
+      <TopBar label="Brief" />
 
       {/* ── Scrollable body ── */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl px-6 py-12">
+        <div className="mx-auto w-full max-w-4xl px-[42px] xl:px-16 py-12">
 
           {/* Narrative */}
           <div className="mb-10 space-y-2 text-center">
@@ -66,7 +40,7 @@ export function BriefScreen() {
                 key={i}
                 className="number-reveal"
                 style={{
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '32px',
                   fontWeight: 300,
                   lineHeight: 1.45,
@@ -93,9 +67,9 @@ export function BriefScreen() {
               }}
             >
               <CheckCircle size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'Apparat', system-ui, sans-serif" }}>{handledCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Handled</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Auto-replied or resolved by AI</div>
+              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{handledCount}</div>
+              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Handled</div>
+              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Auto-replied or resolved by AI</div>
             </div>
 
             {/* Needs Judgment */}
@@ -108,9 +82,9 @@ export function BriefScreen() {
               }}
             >
               <AlertTriangle size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'Apparat', system-ui, sans-serif" }}>{reviewCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Needs Judgment</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Requires human review before action</div>
+              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{reviewCount}</div>
+              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Needs Judgment</div>
+              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Requires human review before action</div>
             </div>
 
             {/* Recurring Incidents */}
@@ -123,9 +97,9 @@ export function BriefScreen() {
               }}
             >
               <Layers size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'Apparat', system-ui, sans-serif" }}>{incidentCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Recurring Incidents</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'Apparat', system-ui, sans-serif" }}>Clusters of related complaints</div>
+              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{incidentCount}</div>
+              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Recurring Incidents</div>
+              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Clusters of related complaints</div>
             </div>
           </div>
 
@@ -146,7 +120,7 @@ export function BriefScreen() {
                 <div>
                   <div
                     style={{
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '9px',
                       fontWeight: 600,
                       letterSpacing: '0.2em',
@@ -159,7 +133,7 @@ export function BriefScreen() {
                   </div>
                   <div
                     style={{
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '20px',
                       fontWeight: 500,
                       color: 'rgba(255,255,255,0.82)',
@@ -170,7 +144,7 @@ export function BriefScreen() {
                   <div
                     style={{
                       marginTop: '8px',
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '13px',
                       color: 'rgba(255,255,255,0.35)',
                     }}
@@ -186,7 +160,7 @@ export function BriefScreen() {
                     padding: '6px 12px',
                     border: '1px solid rgba(255,255,255,0.12)',
                     background: 'rgba(255,255,255,0.06)',
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '9px',
                     fontWeight: 600,
                     letterSpacing: '0.22em',
@@ -204,7 +178,7 @@ export function BriefScreen() {
                   border: '1px solid rgba(255,255,255,0.06)',
                   background: 'rgba(255,255,255,0.04)',
                   padding: '16px',
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '13px',
                   lineHeight: 1.6,
                   color: 'rgba(255,255,255,0.65)',
@@ -229,7 +203,7 @@ export function BriefScreen() {
                 color: '#0A0A0A',
                 border: 'none',
                 padding: '14px 32px',
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '13px',
                 fontWeight: 600,
                 letterSpacing: '0.16em',

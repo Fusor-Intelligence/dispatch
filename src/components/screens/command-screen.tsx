@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ScreenShell } from '@/components/layout/screen-shell'
+import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { approveEmail, fetchAllData } from '@/lib/api'
 import { Check } from 'lucide-react'
@@ -93,77 +94,62 @@ export function CommandScreen() {
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
       {/* ── Top bar ── */}
-      <div
-        className="flex shrink-0 items-center justify-between px-6 pt-5 pb-4"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        {/* Logo */}
-        <div
-          style={{
-            fontFamily: "'Apparat', system-ui, sans-serif",
-            fontSize: '28px',
-            fontWeight: 700,
-            letterSpacing: '-0.03em',
-            color: '#f0f0f0',
-          }}
-        >
-          Dispatch
-        </div>
-
-        {/* Weight slider */}
-        <div className="flex items-center gap-4">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{
-                fontFamily: "'Apparat', system-ui, sans-serif",
-                fontSize: '9px', fontWeight: 600,
-                letterSpacing: '0.28em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.3)',
-              }}>Weight</span>
-              <span style={{
-                fontFamily: "'Apparat', system-ui, sans-serif",
-                fontSize: '13px', fontWeight: 400,
-                color: 'rgba(255,255,255,0.6)',
-                minWidth: '28px', textAlign: 'right',
-              }}>{weight}</span>
+      <TopBar
+        center={
+          <div className="flex items-center gap-4">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
+                  fontSize: '9px', fontWeight: 600,
+                  letterSpacing: '0.28em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.3)',
+                }}>Weight</span>
+                <span style={{
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
+                  fontSize: '13px', fontWeight: 400,
+                  color: 'rgba(255,255,255,0.6)',
+                  minWidth: '28px', textAlign: 'right',
+                }}>{weight}</span>
+              </div>
+              <input
+                type="range"
+                min={300} max={900} step={1}
+                value={weight}
+                onChange={e => setWeight(Number(e.target.value))}
+                className="dispatch-slider"
+                style={{ width: '200px' }}
+              />
             </div>
-            <input
-              type="range"
-              min={300} max={900} step={1}
-              value={weight}
-              onChange={e => setWeight(Number(e.target.value))}
-              className="dispatch-slider"
-              style={{ width: '200px' }}
-            />
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex items-center gap-1.5">
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              style={{
-                padding: '7px 16px',
-                borderRadius: '9999px',
-                border: '1px solid',
-                borderColor: tab === t.id ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)',
-                background: tab === t.id ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
-                fontFamily: "'Apparat', system-ui, sans-serif",
-                fontSize: '11px',
-                fontWeight: tab === t.id ? 600 : 400,
-                letterSpacing: '0.06em',
-                color: tab === t.id ? '#f0f0f0' : 'rgba(255,255,255,0.35)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
+        }
+        right={
+          <div className="flex items-center gap-1.5">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: '9999px',
+                  border: '1px solid',
+                  borderColor: tab === t.id ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)',
+                  background: tab === t.id ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
+                  fontSize: '11px',
+                  fontWeight: tab === t.id ? 600 : 400,
+                  letterSpacing: '0.06em',
+                  color: tab === t.id ? '#f0f0f0' : 'rgba(255,255,255,0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       {/* ── Body ── */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -180,7 +166,7 @@ export function CommandScreen() {
           {/* Section label */}
           <div style={{
             padding: '12px 20px 8px',
-            fontFamily: "'Apparat', system-ui, sans-serif",
+            fontFamily: "'KMR Apparat', system-ui, sans-serif",
             fontSize: '9px', fontWeight: 600,
             letterSpacing: '0.3em', textTransform: 'uppercase',
             color: 'rgba(255,255,255,0.2)',
@@ -229,7 +215,7 @@ export function CommandScreen() {
                 style={{ padding: '28px 36px', minHeight: 0 }}
               >
                 <div style={{
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '10px', fontWeight: 500,
                   letterSpacing: '0.22em', textTransform: 'uppercase',
                   color: 'rgba(255,255,255,0.28)',
@@ -239,7 +225,7 @@ export function CommandScreen() {
                 </div>
 
                 <div style={{
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '26px',
                   fontWeight: weight,
                   lineHeight: 1.4,
@@ -271,7 +257,7 @@ export function CommandScreen() {
                   overflow: 'hidden',
                 }}>
                   <div style={{
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '9px', fontWeight: 600,
                     letterSpacing: '0.3em', textTransform: 'uppercase',
                     color: 'rgba(255,255,255,0.2)',
@@ -286,13 +272,13 @@ export function CommandScreen() {
                     ].map(([k, v]) => (
                       <div key={k}>
                         <div style={{
-                          fontFamily: "'Apparat', system-ui, sans-serif",
+                          fontFamily: "'KMR Apparat', system-ui, sans-serif",
                           fontSize: '9px', letterSpacing: '0.16em',
                           color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase',
                           marginBottom: '3px',
                         }}>{k}</div>
                         <div style={{
-                          fontFamily: "'Apparat', system-ui, sans-serif",
+                          fontFamily: "'KMR Apparat', system-ui, sans-serif",
                           fontSize: '13px', fontWeight: 500,
                           color: 'rgba(255,255,255,0.7)',
                           letterSpacing: '-0.01em',
@@ -309,7 +295,7 @@ export function CommandScreen() {
                   overflow: 'hidden',
                 }}>
                   <div style={{
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '9px', fontWeight: 600,
                     letterSpacing: '0.3em', textTransform: 'uppercase',
                     color: 'rgba(255,255,255,0.2)',
@@ -317,7 +303,7 @@ export function CommandScreen() {
                   }}>Insight 02</div>
                   {selectedEmail.summary ? (
                     <div style={{
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '13px', fontWeight: 400,
                       lineHeight: 1.6,
                       color: 'rgba(255,255,255,0.55)',
@@ -337,7 +323,7 @@ export function CommandScreen() {
                         borderRadius: '9999px',
                         background: '#f3b36b',
                         color: '#0A0A0A',
-                        fontFamily: "'Apparat', system-ui, sans-serif",
+                        fontFamily: "'KMR Apparat', system-ui, sans-serif",
                         fontSize: '11px', fontWeight: 600,
                         letterSpacing: '0.1em', textTransform: 'uppercase',
                         border: 'none', cursor: 'pointer',
@@ -356,7 +342,7 @@ export function CommandScreen() {
             /* Empty right state */
             <div className="flex flex-1 items-center justify-center">
               <div style={{
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '13px', fontWeight: 400,
                 letterSpacing: '0.16em', textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.12)',
@@ -408,7 +394,7 @@ function EmailBucketRow({
 
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{
-          fontFamily: "'Apparat', system-ui, sans-serif",
+          fontFamily: "'KMR Apparat', system-ui, sans-serif",
           fontSize: '11px', fontWeight: isSelected ? 600 : 500,
           letterSpacing: '0.14em', textTransform: 'uppercase',
           color: isSelected ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
@@ -416,7 +402,7 @@ function EmailBucketRow({
           transition: 'color 0.12s ease',
         }}>{label}</div>
         <div style={{
-          fontFamily: "'Apparat', system-ui, sans-serif",
+          fontFamily: "'KMR Apparat', system-ui, sans-serif",
           fontSize: '10px', fontWeight: 400,
           color: 'rgba(255,255,255,0.22)',
           marginTop: '2px',
@@ -454,14 +440,14 @@ function ClusterRow({
       <span style={{ width: '6px', height: '6px', flexShrink: 0, background: sevColor, borderRadius: '1px' }} />
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{
-          fontFamily: "'Apparat', system-ui, sans-serif",
+          fontFamily: "'KMR Apparat', system-ui, sans-serif",
           fontSize: '11px', fontWeight: isSelected ? 600 : 500,
           letterSpacing: '0.14em', textTransform: 'uppercase',
           color: isSelected ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>Issues Tracking</div>
         <div style={{
-          fontFamily: "'Apparat', system-ui, sans-serif",
+          fontFamily: "'KMR Apparat', system-ui, sans-serif",
           fontSize: '10px', color: 'rgba(255,255,255,0.22)',
           marginTop: '2px',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -477,19 +463,19 @@ function ClusterDetail({ cluster }: { cluster: IssueCluster }) {
   return (
     <div style={{ padding: '28px 36px', flex: 1, overflowY: 'auto' }}>
       <div style={{
-        fontFamily: "'Apparat', system-ui, sans-serif",
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
         fontSize: '9px', fontWeight: 600, letterSpacing: '0.3em',
         textTransform: 'uppercase', color: sevColor, marginBottom: '12px',
       }}>{cluster.severity} · {cluster.emailCount} reports</div>
       <div style={{
-        fontFamily: "'Apparat', system-ui, sans-serif",
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
         fontSize: '28px', fontWeight: 500,
         lineHeight: 1.35, letterSpacing: '-0.02em',
         color: 'rgba(255,255,255,0.82)',
         maxWidth: '640px', marginBottom: '24px',
       }}>{cluster.title}</div>
       <div style={{
-        fontFamily: "'Apparat', system-ui, sans-serif",
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
         fontSize: '13px', fontWeight: 400,
         lineHeight: 1.7, color: 'rgba(255,255,255,0.45)',
         maxWidth: '560px',
@@ -506,7 +492,7 @@ function EmptyState({ label }: { label: string }) {
     <div style={{
       padding: '40px 20px',
       textAlign: 'center',
-      fontFamily: "'Apparat', system-ui, sans-serif",
+      fontFamily: "'KMR Apparat', system-ui, sans-serif",
       fontSize: '11px', letterSpacing: '0.14em',
       textTransform: 'uppercase',
       color: 'rgba(255,255,255,0.15)',

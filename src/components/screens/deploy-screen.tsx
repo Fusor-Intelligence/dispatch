@@ -1,39 +1,13 @@
 'use client'
 
 import { ScreenShell } from '@/components/layout/screen-shell'
+import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { seedDemo } from '@/lib/api'
 import { Zap, MessageSquare, AlertTriangle, Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ICONS: Record<string, typeof Zap> = { Zap, MessageSquare, AlertTriangle, Layers }
-
-const TOP_BAR: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  height: '56px',
-  padding: '0 24px',
-  borderBottom: '1px solid rgba(255,255,255,0.06)',
-  flexShrink: 0,
-}
-
-const WORDMARK: React.CSSProperties = {
-  fontFamily: "'Apparat', system-ui, sans-serif",
-  fontSize: '28px',
-  fontWeight: 700,
-  letterSpacing: '-0.03em',
-  color: 'rgba(255,255,255,0.85)',
-}
-
-const STATUS_LABEL: React.CSSProperties = {
-  fontFamily: "'Apparat', system-ui, sans-serif",
-  fontSize: '9px',
-  fontWeight: 600,
-  letterSpacing: '0.3em',
-  textTransform: 'uppercase' as const,
-  color: 'rgba(255,255,255,0.2)',
-}
 
 export function DeployScreen() {
   const {
@@ -76,20 +50,17 @@ export function DeployScreen() {
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
       {/* ── Top bar ── */}
-      <div style={TOP_BAR}>
-        <div style={WORDMARK}>Dispatch</div>
-        <div style={STATUS_LABEL}>Configure</div>
-      </div>
+      <TopBar label="Configure" />
 
       {/* ── Body ── */}
-      <div className="flex flex-1 items-center justify-center overflow-y-auto px-8 py-10">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-[42px] py-10 xl:px-16">
         <div className="grid w-full max-w-[1320px] gap-12 xl:grid-cols-[1fr_1.25fr] xl:items-center">
 
           {/* Left: Brand */}
           <div className="space-y-6">
             {/* Kicker */}
             <div style={{
-              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '9px',
               fontWeight: 600,
               letterSpacing: '0.3em',
@@ -112,7 +83,7 @@ export function DeployScreen() {
                 borderRadius: '1.6rem',
                 border: '1px solid rgba(255,255,255,0.12)',
                 background: 'rgba(255,255,255,0.06)',
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '28px',
                 fontWeight: 600,
                 color: 'rgba(255,255,255,0.82)',
@@ -122,7 +93,7 @@ export function DeployScreen() {
 
               <div>
                 <h1 style={{
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '56px',
                   fontWeight: 700,
                   lineHeight: 1,
@@ -137,7 +108,7 @@ export function DeployScreen() {
                   fontSize: '15px',
                   lineHeight: 1.75,
                   color: 'rgba(255,255,255,0.45)',
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 }}>
                   Assign an AI operator to your support inbox. It reads, triages,
                   drafts replies, and surfaces the issues that matter — you approve
@@ -156,7 +127,7 @@ export function DeployScreen() {
                 borderRadius: '9999px',
                 border: '1px solid rgba(255,255,255,0.08)',
                 background: 'rgba(255,255,255,0.04)',
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '11px',
                 letterSpacing: '0.06em',
                 color: 'rgba(255,255,255,0.45)',
@@ -183,7 +154,7 @@ export function DeployScreen() {
               padding: '24px',
             }}>
               <div style={{
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '17px',
                 fontWeight: 600,
                 color: 'rgba(255,255,255,0.82)',
@@ -194,7 +165,7 @@ export function DeployScreen() {
                 marginTop: '4px',
                 fontSize: '13px',
                 color: 'rgba(255,255,255,0.35)',
-                fontFamily: "'Apparat', system-ui, sans-serif",
+                fontFamily: "'KMR Apparat', system-ui, sans-serif",
               }}>
                 Choose a mission profile and Dispatch will begin investigating.
               </p>
@@ -216,7 +187,7 @@ export function DeployScreen() {
                       textAlign: 'left',
                       cursor: 'pointer',
                       transition: 'background 0.15s ease, border-color 0.15s ease',
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     }}
                   >
                     <Icon
@@ -266,7 +237,7 @@ export function DeployScreen() {
                     borderBottomWidth: i < guardrails.length - 1 ? '1px' : undefined,
                     cursor: 'pointer',
                     textAlign: 'left',
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   }}
                 >
                   <span style={{
@@ -317,7 +288,7 @@ export function DeployScreen() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     background: 'transparent',
                     padding: '12px 20px',
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '13px',
                     color: 'rgba(255,255,255,0.4)',
                     cursor: 'pointer',
@@ -336,7 +307,7 @@ export function DeployScreen() {
                     border: '1px solid rgba(255,255,255,0.1)',
                     background: 'transparent',
                     padding: '12px 20px',
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '13px',
                     color: 'rgba(255,255,255,0.4)',
                     cursor: 'pointer',
@@ -359,7 +330,7 @@ export function DeployScreen() {
                   borderRadius: '9999px',
                   background: '#fff',
                   color: '#0A0A0A',
-                  fontFamily: "'Apparat', system-ui, sans-serif",
+                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '13px',
                   fontWeight: 600,
                   letterSpacing: '0.12em',

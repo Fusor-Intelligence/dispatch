@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { ScreenShell } from '@/components/layout/screen-shell'
+import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { runSync, runClassify, runCluster, fetchAllData } from '@/lib/api'
 import { Check, X } from 'lucide-react'
@@ -13,33 +14,6 @@ const STEP_DEFS = [
   { id: 'cluster',  label: 'Detecting recurring patterns' },
   { id: 'prepare',  label: 'Preparing your briefing' },
 ]
-
-const TOP_BAR: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  height: '56px',
-  padding: '0 24px',
-  borderBottom: '1px solid rgba(255,255,255,0.06)',
-  flexShrink: 0,
-}
-
-const WORDMARK: React.CSSProperties = {
-  fontFamily: "'Apparat', system-ui, sans-serif",
-  fontSize: '28px',
-  fontWeight: 700,
-  letterSpacing: '-0.03em',
-  color: 'rgba(255,255,255,0.85)',
-}
-
-const STATUS_LABEL: React.CSSProperties = {
-  fontFamily: "'Apparat', system-ui, sans-serif",
-  fontSize: '9px',
-  fontWeight: 600,
-  letterSpacing: '0.3em',
-  textTransform: 'uppercase' as const,
-  color: 'rgba(255,255,255,0.2)',
-}
 
 export function SweepScreen() {
   const {
@@ -141,19 +115,16 @@ export function SweepScreen() {
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
       {/* ── Top bar ── */}
-      <div style={TOP_BAR}>
-        <div style={WORDMARK}>Dispatch</div>
-        <div style={STATUS_LABEL}>Sweep</div>
-      </div>
+      <TopBar label="Sweep" />
 
       {/* ── Body ── */}
       <div className="flex flex-1 items-center justify-center overflow-y-auto">
-        <div style={{ width: '100%', maxWidth: '560px', padding: '0 24px' }}>
+        <div style={{ width: '100%', maxWidth: '560px' }} className="px-[42px] xl:px-16">
 
           {/* Heading block */}
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <div style={{
-              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '9px',
               fontWeight: 600,
               letterSpacing: '0.3em',
@@ -164,7 +135,7 @@ export function SweepScreen() {
               Live Sweep
             </div>
             <h2 style={{
-              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '40px',
               fontWeight: 300,
               lineHeight: 1.2,
@@ -182,7 +153,7 @@ export function SweepScreen() {
               fontSize: '13px',
               lineHeight: 1.6,
               color: 'rgba(255,255,255,0.35)',
-              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontFamily: "'KMR Apparat', system-ui, sans-serif",
             }}>
               {phase === 'complete'
                 ? 'Your briefing is ready.'
@@ -308,7 +279,7 @@ export function SweepScreen() {
                 {/* Step text */}
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{
-                    fontFamily: "'Apparat', system-ui, sans-serif",
+                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '13px',
                     fontWeight: 500,
                     color: step.status === 'done'
@@ -323,7 +294,7 @@ export function SweepScreen() {
                   {step.detail && (
                     <div style={{
                       marginTop: '3px',
-                      fontFamily: "'Apparat', system-ui, sans-serif",
+                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '11px',
                       color: 'rgba(255,255,255,0.3)',
                     }}>
@@ -343,7 +314,7 @@ export function SweepScreen() {
               border: '1px solid rgba(255,255,255,0.1)',
               background: 'rgba(255,255,255,0.04)',
               padding: '12px 16px',
-              fontFamily: "'Apparat', system-ui, sans-serif",
+              fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '13px',
               color: 'rgba(255,255,255,0.6)',
             }}>
