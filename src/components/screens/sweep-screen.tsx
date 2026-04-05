@@ -2,33 +2,24 @@
 
 import { useEffect, useRef } from 'react'
 import { ScreenShell } from '@/components/layout/screen-shell'
-import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { runSync, runClassify, runCluster, fetchAllData } from '@/lib/api'
 import { Check, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+
+import { APPARAT } from '@/lib/constants'
 
 const STEP_DEFS = [
-  { id: 'sync',     label: 'Reading conversations' },
+  { id: 'sync',     label: 'Reading conversations'                       },
   { id: 'classify', label: 'Classifying messages and drafting responses' },
-  { id: 'cluster',  label: 'Detecting recurring patterns' },
-  { id: 'prepare',  label: 'Preparing your briefing' },
+  { id: 'cluster',  label: 'Detecting recurring patterns'                },
+  { id: 'prepare',  label: 'Preparing your briefing'                     },
 ]
 
 export function SweepScreen() {
   const {
-    dataSource,
-    sweepProgress,
-    setSweepPhase,
-    addSweepStep,
-    updateSweepStep,
-    setSweepResult,
-    setSweepError,
-    setEmails,
-    setClusters,
-    setStats,
-    setGmailConnected,
-    navigateTo,
+    dataSource, sweepProgress,
+    setSweepPhase, addSweepStep, updateSweepStep, setSweepResult, setSweepError,
+    setEmails, setClusters, setStats, setGmailConnected, navigateTo,
   } = useDispatchStore()
 
   const started = useRef(false)
@@ -41,68 +32,36 @@ export function SweepScreen() {
   }, [])
 
   async function runSweep() {
-    // Initialize all steps as pending
     for (const def of STEP_DEFS) {
       addSweepStep({ id: def.id, label: def.label, status: 'pending' })
     }
-
     try {
-      // Step 1: Sync (skip for demo — data already seeded)
       if (dataSource === 'gmail') {
         setSweepPhase('syncing')
         updateSweepStep('sync', { status: 'running', label: 'Reading conversations...' })
-        const syncResult = await runSync()
-        setSweepResult('syncResult', syncResult)
-        updateSweepStep('sync', {
-          status: 'done',
-          detail: `${syncResult.total} conversations read`,
-          timestamp: Date.now(),
-        })
+        const r = await runSync()
+        setSweepResult('syncResult', r)
+        updateSweepStep('sync', { status: 'done', detail: `${r.total} conversations read`, timestamp: Date.now() })
       } else {
-        updateSweepStep('sync', {
-          status: 'done',
-          label: 'Loading demo inbox',
-          detail: 'Pre-seeded conversations loaded',
-          timestamp: Date.now(),
-        })
+        updateSweepStep('sync', { status: 'done', label: 'Reading conversations', detail: 'Pre-seeded conversations loaded', timestamp: Date.now() })
       }
-
-      // Step 2: Classify
       setSweepPhase('classifying')
-      updateSweepStep('classify', { status: 'running', label: 'Classifying messages and drafting responses...' })
-      const classifyResult = await runClassify()
-      setSweepResult('classifyResult', classifyResult)
-      updateSweepStep('classify', {
-        status: 'done',
-        detail: classifyResult.classified > 0
-          ? `${classifyResult.classified} classified, ${classifyResult.draftsGenerated} drafts generated`
-          : 'All messages pre-classified',
-        timestamp: Date.now(),
-      })
+      updateSweepStep('classify', { status: 'running' })
+      const cr = await runClassify()
+      setSweepResult('classifyResult', cr)
+      updateSweepStep('classify', { status: 'done', detail: cr.classified > 0 ? `${cr.classified} classified, ${cr.draftsGenerated} drafts` : 'All messages pre-classified', timestamp: Date.now() })
 
-      // Step 3: Cluster
       setSweepPhase('clustering')
-      updateSweepStep('cluster', { status: 'running', label: 'Detecting recurring patterns...' })
-      const clusterResult = await runCluster()
-      setSweepResult('clusterResult', clusterResult)
-      updateSweepStep('cluster', {
-        status: 'done',
-        detail: `${clusterResult.clusters} issue clusters detected`,
-        timestamp: Date.now(),
-      })
+      updateSweepStep('cluster', { status: 'running' })
+      const clr = await runCluster()
+      setSweepResult('clusterResult', clr)
+      updateSweepStep('cluster', { status: 'done', detail: `${clr.clusters} issue clusters detected`, timestamp: Date.now() })
 
-      // Step 4: Fetch all data
-      updateSweepStep('prepare', { status: 'running', label: 'Preparing your briefing...' })
+      updateSweepStep('prepare', { status: 'running' })
       const data = await fetchAllData()
-      setEmails(data.emails)
-      setClusters(data.clusters)
-      setStats(data.stats)
-      setGmailConnected(data.gmailConnected)
+      setEmails(data.emails); setClusters(data.clusters); setStats(data.stats); setGmailConnected(data.gmailConnected)
       updateSweepStep('prepare', { status: 'done', timestamp: Date.now() })
-
       setSweepPhase('complete')
-
-      // Auto-transition to brief
       setTimeout(() => navigateTo('brief'), 1500)
     } catch (err) {
       console.error('Sweep failed:', err)
@@ -111,225 +70,117 @@ export function SweepScreen() {
   }
 
   const { steps, phase, error } = sweepProgress
+  const isComplete = phase === 'complete'
+  const activeStep = steps.find(s => s.status === 'running')
+  const doneCount = steps.filter(s => s.status === 'done').length
 
   return (
-    <ScreenShell className="flex flex-col overflow-hidden">
-      {/* ── Top bar ── */}
-      <TopBar label="Sweep" />
+    <ScreenShell
+      className="flex flex-col overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0A0A0A 50%, #1C1C1C 112.05%, #2E4246 136.61%)' }}
+    >
+      <div className="flex min-h-0 flex-1 flex-col" style={{ padding: '36px' }}>
 
-      {/* ── Body ── */}
-      <div className="flex flex-1 items-center justify-center overflow-y-auto">
-        <div style={{ width: '100%', maxWidth: '560px' }} className="px-[42px] xl:px-16">
+        {/* Kicker */}
+        <div className="stagger-fade-up" style={{ '--stagger': 0, ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '48px', textTransform: 'uppercase', color: '#FFFFFF' } as React.CSSProperties}>
+          Sweep:
+        </div>
 
-          {/* Heading block */}
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <div style={{
-              fontFamily: "'KMR Apparat', system-ui, sans-serif",
-              fontSize: '9px',
-              fontWeight: 600,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.2)',
-              marginBottom: '16px',
-            }}>
-              Live Sweep
-            </div>
-            <h2 style={{
-              fontFamily: "'KMR Apparat', system-ui, sans-serif",
-              fontSize: '40px',
-              fontWeight: 300,
-              lineHeight: 1.2,
-              letterSpacing: '-0.02em',
-              color: 'rgba(255,255,255,0.82)',
-              margin: 0,
-            }}>
-              {phase === 'complete' ? 'Investigation complete' : 'Investigating your inbox'}
-            </h2>
-            <p style={{
-              marginTop: '12px',
-              maxWidth: '360px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              fontSize: '13px',
-              lineHeight: 1.6,
-              color: 'rgba(255,255,255,0.35)',
-              fontFamily: "'KMR Apparat', system-ui, sans-serif",
-            }}>
-              {phase === 'complete'
-                ? 'Your briefing is ready.'
-                : 'Dispatch is reading, classifying, and organizing your support conversations.'}
-            </p>
+        {/* Headline — fills remaining space */}
+        <div className="flex-1 flex items-start stagger-fade-up" style={{ '--stagger': 1, paddingBottom: '32px' } as React.CSSProperties}>
+          <div style={{ ...APPARAT, fontWeight: 300, fontSize: '48px', lineHeight: '48px', textTransform: 'capitalize', color: '#F6F1E8', maxWidth: '700px' }}>
+            {isComplete
+              ? 'Investigation Complete.'
+              : activeStep
+              ? `${activeStep.label}.`
+              : 'Investigating Your Inbox.'}
           </div>
+        </div>
 
-          {/* Progress ring */}
-          <div style={{
+        {/* Bottom row: progress card + 4 step cards */}
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '14px', flexShrink: 0, height: '165px' }}>
+
+          {/* Progress card */}
+          <div className="stagger-fade-up" style={{
+            '--stagger': 2,
+            position: 'relative',
+            flex: 1,
+            background: 'rgba(255,255,255,0.1)',
+            borderRadius: '8px',
+            padding: '20px 17px',
+            isolation: 'isolate',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 40px',
-            width: '112px',
-            height: '112px',
-          }}>
-            {phase === 'complete' ? (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: '100%',
-                borderRadius: '9999px',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.04)',
-              }}>
-                <Check size={40} style={{ color: 'rgba(255,255,255,0.82)' }} />
-              </div>
-            ) : phase === 'error' ? (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: '100%',
-                borderRadius: '9999px',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.04)',
-              }}>
-                <X size={40} style={{ color: 'rgba(255,255,255,0.6)' }} />
-              </div>
-            ) : (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: '100%',
-                borderRadius: '9999px',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.04)',
-              }}>
-                {/* White spinner */}
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '9999px',
-                  border: '2px solid rgba(255,255,255,0.1)',
-                  borderTopColor: 'rgba(255,255,255,0.7)',
-                  animation: 'spin 0.8s linear infinite',
-                }} />
-              </div>
-            )}
-          </div>
-
-          {/* Action log */}
-          <div style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: '16px',
-            overflow: 'hidden',
-          }}>
-            {steps.map((step, i) => (
-              <div
-                key={step.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '16px',
-                  padding: '16px 20px',
-                  borderBottom: i < steps.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-                  opacity: step.status === 'pending' ? 0.4 : 1,
-                  transition: 'opacity 0.2s ease',
-                }}
-              >
-                {/* Step icon */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '24px',
-                  height: '24px',
-                  flexShrink: 0,
-                  marginTop: '1px',
-                }}>
-                  {step.status === 'running' && (
-                    <div style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '9999px',
-                      border: '2px solid rgba(255,255,255,0.12)',
-                      borderTopColor: 'rgba(255,255,255,0.7)',
-                      animation: 'spin 0.8s linear infinite',
-                    }} />
-                  )}
-                  {step.status === 'done' && (
-                    <Check size={16} style={{ color: 'rgba(255,255,255,0.82)' }} />
-                  )}
-                  {step.status === 'error' && (
-                    <X size={16} style={{ color: 'rgba(255,255,255,0.6)' }} />
-                  )}
-                  {step.status === 'pending' && (
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '9999px',
-                      background: 'rgba(255,255,255,0.4)',
-                    }} />
-                  )}
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          } as React.CSSProperties}>
+            <div style={{ position: 'absolute', width: '6px', height: '7px', left: '17px', top: '60px', background: 'rgba(217,217,217,0.5)', zIndex: 1 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '60px', alignSelf: 'stretch' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignSelf: 'stretch', alignItems: 'flex-start' }}>
+                <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', color: '#FFFFFF', textTransform: 'capitalize' }}>
+                  {isComplete ? 'Complete' : 'Progress'}
                 </div>
-
-                {/* Step text */}
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{
-                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    color: step.status === 'done'
-                      ? 'rgba(255,255,255,0.7)'
-                      : step.status === 'running'
-                      ? 'rgba(255,255,255,0.9)'
-                      : 'rgba(255,255,255,0.25)',
-                    transition: 'color 0.2s ease',
-                  }}>
-                    {step.label}
-                  </div>
-                  {step.detail && (
-                    <div style={{
-                      marginTop: '3px',
-                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                      fontSize: '11px',
-                      color: 'rgba(255,255,255,0.3)',
-                    }}>
-                      {step.detail}
-                    </div>
-                  )}
+                <div style={{ ...APPARAT, fontWeight: 300, fontSize: '64px', lineHeight: '48px', color: '#FFFFFF' }}>
+                  {doneCount}/{STEP_DEFS.length}
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Error message */}
-          {error && (
-            <div style={{
-              marginTop: '16px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.04)',
-              padding: '12px 16px',
-              fontFamily: "'KMR Apparat', system-ui, sans-serif",
-              fontSize: '13px',
-              color: 'rgba(255,255,255,0.6)',
-            }}>
-              {error}
+              <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', textAlign: 'right', textTransform: 'capitalize', color: '#FFFFFF', alignSelf: 'stretch' }}>
+                {isComplete ? 'Briefing Ready' : 'Steps Completed'}
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Step cards */}
+          {STEP_DEFS.map((def, i) => {
+            const step = steps.find(s => s.id === def.id)
+            const status = step?.status ?? 'pending'
+            const isActive = status === 'running'
+            const isDone = status === 'done'
+            return (
+              <div
+                key={def.id}
+                className={`stagger-fade-up${isActive ? ' dispatch-step-active' : ''}`}
+                style={{
+                  '--stagger': 3 + i,
+                  position: 'relative',
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  padding: '20px 17px',
+                  isolation: 'isolate',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  opacity: status === 'pending' ? 0.35 : 1,
+                  transition: 'opacity 0.3s ease',
+                } as React.CSSProperties}
+              >
+                <div style={{ position: 'absolute', width: '6px', height: '7px', left: '17px', top: '60px', background: isDone ? 'rgba(255,255,255,0.7)' : isActive ? 'rgba(255,255,255,0.4)' : 'rgba(217,217,217,0.3)', zIndex: 1 }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '60px', alignSelf: 'stretch' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignSelf: 'stretch', alignItems: 'flex-start' }}>
+                    <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', color: '#FFFFFF', textTransform: 'capitalize' }}>
+                      {isActive ? (
+                        <div style={{ width: '16px', height: '16px', borderRadius: '9999px', border: '2px solid rgba(255,255,255,0.15)', borderTopColor: '#FFFFFF', animation: 'spin 0.8s linear infinite' }} />
+                      ) : isDone ? (
+                        <Check size={18} style={{ color: '#FFFFFF' }} />
+                      ) : (
+                        <span style={{ opacity: 0.3 }}>—</span>
+                      )}
+                    </div>
+                    <div style={{ ...APPARAT, fontWeight: 300, fontSize: '64px', lineHeight: '48px', color: '#FFFFFF', opacity: 0.2 }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+                  <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', textAlign: 'right', textTransform: 'capitalize', color: '#FFFFFF', alignSelf: 'stretch', opacity: status === 'pending' ? 0.5 : 1 }}>
+                    {step?.detail ?? def.label}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Spinner keyframe */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </ScreenShell>
   )
 }

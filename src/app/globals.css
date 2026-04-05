@@ -186,9 +186,6 @@
   html {
     font-family: 'KMR Apparat', system-ui, sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'KMR Apparat', system-ui, sans-serif;
-  }
   body {
     @apply text-foreground;
     min-height: 100vh;
@@ -196,7 +193,6 @@
     isolation: isolate;
     background-color: #0A0A0A;
     color: var(--dispatch-copy);
-    font-family: 'KMR Apparat', system-ui, sans-serif;
     font-kerning: normal;
     font-synthesis: none;
   }
@@ -221,17 +217,13 @@
   }
 
   .dispatch-panel {
-    @apply rounded-[20px] border;
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .dispatch-panel-strong {
-    @apply rounded-[20px] border;
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .dispatch-kicker {
@@ -284,8 +276,8 @@
 
   /* Screen shell */
   .screen-shell {
-    @apply relative flex h-screen w-screen flex-col overflow-hidden;
-    padding-bottom: 80px; /* space for bottom nav */
+    @apply relative flex h-dvh w-full flex-col overflow-hidden;
+    padding-top: 80px;
   }
 
   /* Spinner */
@@ -294,6 +286,86 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-top-color: rgba(255, 255, 255, 0.7);
     border-radius: 9999px;
+  }
+
+  /* ── Staggered entrance ── */
+  .stagger-fade-up {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: staggerFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--stagger, 0) * 80ms);
+  }
+
+  .stagger-fade-in {
+    opacity: 0;
+    animation: staggerFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--stagger, 0) * 80ms);
+  }
+
+  /* ── Card hover micro-interaction ── */
+  .dispatch-card-hover {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s ease,
+                background 0.15s ease;
+  }
+  .dispatch-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ── Primary button ── */
+  .dispatch-btn-primary {
+    transition: filter 0.2s ease,
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s ease;
+  }
+  .dispatch-btn-primary:hover {
+    filter: brightness(0.92);
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+  }
+  .dispatch-btn-primary:active {
+    transform: scale(0.97);
+    filter: brightness(0.88);
+    transition-duration: 80ms;
+  }
+
+  /* ── Ghost / secondary button ── */
+  .dispatch-btn-ghost {
+    transition: background 0.15s ease,
+                color 0.15s ease,
+                transform 0.15s ease;
+  }
+  .dispatch-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+  .dispatch-btn-ghost:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+
+  /* ── Toggle with spring overshoot ── */
+  .dispatch-toggle-thumb {
+    transition: left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .dispatch-toggle-track {
+    transition: background 0.2s ease;
+  }
+
+  /* ── Subtle glow for active step ── */
+  .dispatch-step-active {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    animation: stepGlow 2.5s ease-in-out infinite;
+  }
+
+  /* ── Word reveal for brief quote ── */
+  .word-reveal > span {
+    display: inline;
+    opacity: 0;
+    transform: translateY(6px);
+    animation: wordFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--word-i, 0) * 60ms + 200ms);
   }
 
   /* Apparat-style minimal slider */
@@ -360,4 +432,34 @@
 @keyframes glyphHover {
   from { transform: scale(1); }
   to   { transform: scale(1.08); }
+}
+@keyframes staggerFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes staggerFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes wordFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes stepGlow {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04); }
+  50%      { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); }
+}
+@keyframes tabSlide {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

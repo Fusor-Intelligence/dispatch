@@ -1,3 +1,11 @@
+import type { CSSProperties } from 'react'
+
+export const APPARAT: CSSProperties = {
+  fontFamily: "'KMR Apparat', system-ui, sans-serif",
+}
+
+export const APPARAT_FONT = "'KMR Apparat', system-ui, sans-serif"
+
 export const CATEGORY_COLORS: Record<string, string> = {
   refund: '#818cf8',
   cancellation: '#c084fc',

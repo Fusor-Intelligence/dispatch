@@ -2,37 +2,27 @@
 
 import { useState } from 'react'
 import { ScreenShell } from '@/components/layout/screen-shell'
-import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { approveEmail, fetchAllData } from '@/lib/api'
 import { Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { SupportEmail, IssueCluster } from '@/lib/types'
+import { APPARAT } from '@/lib/constants'
 
-type TabId = 'all' | 'ready' | 'review' | 'escalated' | 'incidents'
+type FilterId = 'queue' | 'review' | 'issues'
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'all',       label: 'All'       },
-  { id: 'ready',     label: 'Send'      },
-  { id: 'review',    label: 'Review'    },
-  { id: 'escalated', label: 'Escalated' },
-  { id: 'incidents', label: 'Incidents' },
+const FILTERS: { id: FilterId; label: string }[] = [
+  { id: 'queue',  label: 'Queue'  },
+  { id: 'review', label: 'Review' },
+  { id: 'issues', label: 'Issues' },
 ]
 
-const URGENCY_DOT: Record<string, string> = {
-  critical: '#f3755c',
-  high:     '#f3b36b',
-  medium:   '#f8e08f',
-  low:      '#444f5e',
-}
-
 const CATEGORY_LABEL: Record<string, string> = {
-  refund:          'REFUND REQUEST',
-  bug_report:      'BUG REPORT',
-  cancellation:    'CANCELLATION',
-  feature_request: 'FEATURE REQUEST',
-  general_inquiry: 'GENERAL INQUIRY',
-  complaint:       'COMPLAINT',
+  refund:          'Refund Request',
+  bug_report:      'Bug Report',
+  cancellation:    'Cancellation',
+  feature_request: 'Feature Request',
+  general_inquiry: 'General Inquiry',
+  complaint:       'Complaint',
 }
 
 export function CommandScreen() {
@@ -53,21 +43,11 @@ export function CommandScreen() {
     setFlashError,
   } = useDispatchStore()
 
-  const [tab, setTab] = useState<TabId>('all')
-  const [weight, setWeight] = useState(285)
+  const [filter, setFilter] = useState<FilterId>('queue')
   const [selectedClusterId, setSelectedClusterId] = useState<string | null>(null)
 
-  // Filtered email buckets
-  const readyEmails     = emails.filter(e => e.status === 'auto_replied' && (e.confidence ?? 0) >= agentRules.autoApproveThreshold)
-  const reviewEmails    = emails.filter(e => e.status === 'needs_review')
-  const escalatedEmails = emails.filter(e => e.assignedTo === 'Senior Support' || e.assignedTo === 'Manager')
-
-  const listEmails =
-    tab === 'ready'     ? readyEmails :
-    tab === 'review'    ? reviewEmails :
-    tab === 'escalated' ? escalatedEmails :
-    tab === 'incidents' ? [] :
-    emails
+  const readyEmails  = emails.filter(e => e.status === 'auto_replied' && (e.confidence ?? 0) >= agentRules.autoApproveThreshold)
+  const reviewEmails = emails.filter(e => e.status === 'needs_review')
 
   const selectedEmail   = emails.find(e => e.id === selectedEmailId) ?? null
   const selectedCluster = clusters.find(c => c.id === selectedClusterId) ?? null
@@ -93,261 +73,268 @@ export function CommandScreen() {
 
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
-      {/* ── Top bar ── */}
-      <TopBar
-        center={
-          <div className="flex items-center gap-4">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '9px', fontWeight: 600,
-                  letterSpacing: '0.28em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.3)',
-                }}>Weight</span>
-                <span style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '13px', fontWeight: 400,
-                  color: 'rgba(255,255,255,0.6)',
-                  minWidth: '28px', textAlign: 'right',
-                }}>{weight}</span>
-              </div>
-              <input
-                type="range"
-                min={300} max={900} step={1}
-                value={weight}
-                onChange={e => setWeight(Number(e.target.value))}
-                className="dispatch-slider"
-                style={{ width: '200px' }}
-              />
-            </div>
-          </div>
-        }
-        right={
-          <div className="flex items-center gap-1.5">
-            {TABS.map(t => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: '9999px',
-                  border: '1px solid',
-                  borderColor: tab === t.id ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)',
-                  background: tab === t.id ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '11px',
-                  fontWeight: tab === t.id ? 600 : 400,
-                  letterSpacing: '0.06em',
-                  color: tab === t.id ? '#f0f0f0' : 'rgba(255,255,255,0.35)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        }
-      />
+      {/* ── Filter tabs ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 8px 0' }}>
+        {FILTERS.map((f, i) => (
+          <button
+            key={f.id}
+            onClick={() => setFilter(f.id)}
+            className="stagger-fade-up dispatch-btn-ghost"
+            style={{
+              '--stagger': i,
+              width: '84px',
+              height: '29px',
+              borderRadius: '8px',
+              background: filter === f.id ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.07)',
+              border: 'none',
+              ...APPARAT,
+              fontSize: '12px',
+              fontWeight: 300,
+              textTransform: 'capitalize',
+              color: filter === f.id ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: '9px',
+            } as React.CSSProperties}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
 
       {/* ── Body ── */}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden" style={{ gap: '8px', padding: '8px' }}>
 
-        {/* Left column: email / cluster list */}
+        {/* ── Left column: grouped buckets ── */}
         <div
-          className="flex flex-col overflow-hidden"
           style={{
-            width: '320px',
+            width: '300px',
             flexShrink: 0,
-            borderRight: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            overflowY: 'auto',
           }}
         >
-          {/* Section label */}
-          <div style={{
-            padding: '12px 20px 8px',
-            fontFamily: "'KMR Apparat', system-ui, sans-serif",
-            fontSize: '9px', fontWeight: 600,
-            letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.2)',
-            borderBottom: '1px solid rgba(255,255,255,0.04)',
-          }}>
-            {tab === 'incidents' ? 'Issues Tracking' : 'Client Email'}
-          </div>
-
-          {/* List */}
-          <div className="flex-1 overflow-y-auto">
-            {tab === 'incidents' ? (
-              clusters.length === 0 ? (
-                <EmptyState label="No active incidents." />
-              ) : clusters.map(c => (
-                <ClusterRow
-                  key={c.id}
-                  cluster={c}
-                  isSelected={selectedClusterId === c.id}
-                  onSelect={() => setSelectedClusterId(selectedClusterId === c.id ? null : c.id)}
-                />
-              ))
-            ) : listEmails.length === 0 ? (
-              <EmptyState label="No emails in this queue." />
-            ) : listEmails.map(email => (
-              <EmailBucketRow
-                key={email.id}
-                email={email}
-                isSelected={selectedEmailId === email.id}
-                onSelect={() => selectEmail(selectedEmailId === email.id ? null : email.id)}
-              />
-            ))}
-          </div>
+          {filter === 'issues' ? (
+            clusters.length === 0 ? (
+              <EmptyState label="No active incidents." />
+            ) : (
+              <>
+                <BucketHeader count={clusters.length} label="Issues Tracking" />
+                {clusters.map(c => (
+                  <ClusterRow
+                    key={c.id}
+                    cluster={c}
+                    isSelected={selectedClusterId === c.id}
+                    onSelect={() => setSelectedClusterId(selectedClusterId === c.id ? null : c.id)}
+                  />
+                ))}
+              </>
+            )
+          ) : filter === 'review' ? (
+            reviewEmails.length === 0 ? (
+              <EmptyState label="No emails need review." />
+            ) : (
+              <>
+                <BucketHeader count={reviewEmails.length} label="Need Reviews" />
+                {reviewEmails.map(e => (
+                  <EmailRow
+                    key={e.id}
+                    email={e}
+                    isSelected={selectedEmailId === e.id}
+                    onSelect={() => selectEmail(selectedEmailId === e.id ? null : e.id)}
+                  />
+                ))}
+              </>
+            )
+          ) : (
+            /* Queue: two groups stacked */
+            <>
+              {readyEmails.length > 0 && (
+                <>
+                  <BucketHeader count={readyEmails.length} label="Instant Solve" />
+                  {readyEmails.map(e => (
+                    <EmailRow
+                      key={e.id}
+                      email={e}
+                      isSelected={selectedEmailId === e.id}
+                      onSelect={() => selectEmail(selectedEmailId === e.id ? null : e.id)}
+                    />
+                  ))}
+                </>
+              )}
+              {reviewEmails.length > 0 && (
+                <>
+                  <BucketHeader count={reviewEmails.length} label="Need Reviews" />
+                  {reviewEmails.map(e => (
+                    <EmailRow
+                      key={e.id}
+                      email={e}
+                      isSelected={selectedEmailId === e.id}
+                      onSelect={() => selectEmail(selectedEmailId === e.id ? null : e.id)}
+                    />
+                  ))}
+                </>
+              )}
+              {clusters.length > 0 && (
+                <>
+                  <BucketHeader count={clusters.length} label="Issues Tracking" />
+                  {clusters.map(c => (
+                    <ClusterRow
+                      key={c.id}
+                      cluster={c}
+                      isSelected={selectedClusterId === c.id}
+                      onSelect={() => setSelectedClusterId(selectedClusterId === c.id ? null : c.id)}
+                    />
+                  ))}
+                </>
+              )}
+              {readyEmails.length === 0 && reviewEmails.length === 0 && clusters.length === 0 && (
+                <EmptyState label="No emails." />
+              )}
+            </>
+          )}
         </div>
 
-        {/* Right column */}
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-          {tab === 'incidents' && selectedCluster ? (
-            /* Incident detail */
+        {/* ── Right column ── */}
+        <div className="stagger-fade-in" style={{ '--stagger': 3, flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0, overflow: 'hidden' } as React.CSSProperties}>
+          {filter === 'issues' && selectedCluster ? (
             <ClusterDetail cluster={selectedCluster} />
           ) : selectedEmail ? (
             <>
-              {/* Email body — variable weight display */}
+              {/* Email body */}
               <div
-                className="flex-1 overflow-y-auto"
-                style={{ padding: '28px 36px', minHeight: 0 }}
+                className="dispatch-card-hover"
+                style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  padding: '28px 32px',
+                  overflowY: 'auto',
+                  minHeight: 0,
+                }}
               >
                 <div style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '10px', fontWeight: 500,
+                  ...APPARAT,
+                  fontSize: '9px', fontWeight: 600,
                   letterSpacing: '0.22em', textTransform: 'uppercase',
                   color: 'rgba(255,255,255,0.28)',
                   marginBottom: '16px',
                 }}>
                   {selectedEmail.from}
                 </div>
-
                 <div style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '26px',
-                  fontWeight: weight,
-                  lineHeight: 1.4,
-                  letterSpacing: weight > 600 ? '-0.02em' : '-0.01em',
+                  ...APPARAT,
+                  fontSize: '22px',
+                  fontWeight: 300,
+                  lineHeight: 1.5,
+                  letterSpacing: '-0.01em',
                   color: 'rgba(255,255,255,0.82)',
-                  transition: 'font-weight 0.2s ease',
-                  maxWidth: '720px',
                 }}>
                   {selectedEmail.body}
                 </div>
               </div>
 
-              {/* Insight cards */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '1px',
-                  borderTop: '1px solid rgba(255,255,255,0.06)',
-                  background: 'rgba(255,255,255,0.06)',
-                  flexShrink: 0,
-                  height: '200px',
-                }}
-              >
-                {/* Insight 01 — AI Classification */}
-                <div style={{
-                  background: '#0A0A0A',
-                  padding: '20px 24px',
-                  overflow: 'hidden',
+              {/* Insight cards row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', flexShrink: 0 }}>
+                {/* Insight 01 */}
+                <div className="dispatch-card-hover" style={{
+                  position: 'relative',
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  padding: '20px 17px',
+                  isolation: 'isolate',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '10px',
                 }}>
-                  <div style={{
-                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                    fontSize: '9px', fontWeight: 600,
-                    letterSpacing: '0.3em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.2)',
-                    marginBottom: '14px',
-                  }}>Insight 01</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px' }}>
-                    {[
-                      ['Category', CATEGORY_LABEL[selectedEmail.category ?? ''] ?? 'Pending'],
-                      ['Urgency',  (selectedEmail.urgency ?? 'pending').toUpperCase()],
-                      ['Sentiment', (selectedEmail.sentiment ?? 'pending').toUpperCase()],
-                      ['Confidence', `${Math.round((selectedEmail.confidence ?? 0) * 100)}%`],
-                    ].map(([k, v]) => (
-                      <div key={k}>
-                        <div style={{
-                          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                          fontSize: '9px', letterSpacing: '0.16em',
-                          color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase',
-                          marginBottom: '3px',
-                        }}>{k}</div>
-                        <div style={{
-                          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                          fontSize: '13px', fontWeight: 500,
-                          color: 'rgba(255,255,255,0.7)',
-                          letterSpacing: '-0.01em',
-                        }}>{v}</div>
-                      </div>
-                    ))}
+                  <div style={{ position: 'absolute', width: '6px', height: '7px', left: '17px', top: '60px', background: 'rgba(217,217,217,0.5)', zIndex: 1 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px', alignSelf: 'stretch' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', alignSelf: 'stretch' }}>
+                      <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', textTransform: 'capitalize', color: '#FFFFFF' }}>Insight 01</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', alignSelf: 'stretch' }}>
+                      {[
+                        ['Category',   CATEGORY_LABEL[selectedEmail.category ?? ''] ?? 'Pending'],
+                        ['Urgency',    (selectedEmail.urgency ?? 'pending').toUpperCase()],
+                        ['Sentiment',  (selectedEmail.sentiment ?? 'pending').toUpperCase()],
+                        ['Confidence', `${Math.round((selectedEmail.confidence ?? 0) * 100)}%`],
+                      ].map(([k, v]) => (
+                        <div key={k}>
+                          <div style={{ ...APPARAT, fontSize: '9px', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '3px' }}>{k}</div>
+                          <div style={{ ...APPARAT, fontSize: '15px', fontWeight: 300, color: '#FFFFFF' }}>{v}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Insight 02 — Summary + action */}
-                <div style={{
-                  background: '#0A0A0A',
-                  padding: '20px 24px',
-                  overflow: 'hidden',
+                {/* Insight 02 */}
+                <div className="dispatch-card-hover" style={{
+                  position: 'relative',
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  padding: '20px 17px',
+                  isolation: 'isolate',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '10px',
                 }}>
-                  <div style={{
-                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                    fontSize: '9px', fontWeight: 600,
-                    letterSpacing: '0.3em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.2)',
-                    marginBottom: '14px',
-                  }}>Insight 02</div>
-                  {selectedEmail.summary ? (
-                    <div style={{
-                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                      fontSize: '13px', fontWeight: 400,
-                      lineHeight: 1.6,
-                      color: 'rgba(255,255,255,0.55)',
-                    }}>{selectedEmail.summary}</div>
-                  ) : (
-                    <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>No summary.</div>
-                  )}
-                  {/* Approve action */}
-                  {selectedEmail.autoReplyDraft && (selectedEmail.status === 'needs_review' || selectedEmail.status === 'auto_replied') && (
-                    <button
-                      onClick={() => handleApprove(selectedEmail.id)}
-                      disabled={approvingEmailId === selectedEmail.id || !gmailConnected}
-                      style={{
-                        marginTop: '14px',
-                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                        padding: '7px 16px',
-                        borderRadius: '9999px',
-                        background: '#f3b36b',
-                        color: '#0A0A0A',
-                        fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                        fontSize: '11px', fontWeight: 600,
-                        letterSpacing: '0.1em', textTransform: 'uppercase',
-                        border: 'none', cursor: 'pointer',
-                        opacity: approvingEmailId === selectedEmail.id ? 0.6 : 1,
-                        transition: 'filter 0.2s ease',
-                      }}
-                    >
-                      <Check size={12} />
-                      {approvingEmailId === selectedEmail.id ? 'Approving…' : 'Approve & Send'}
-                    </button>
-                  )}
+                  <div style={{ position: 'absolute', width: '6px', height: '7px', left: '17px', top: '60px', background: 'rgba(217,217,217,0.5)', zIndex: 1 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px', alignSelf: 'stretch' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', alignSelf: 'stretch' }}>
+                      <div style={{ ...APPARAT, fontWeight: 300, fontSize: '18px', lineHeight: '100%', textTransform: 'capitalize', color: '#FFFFFF' }}>Insight 02</div>
+                    </div>
+                    {selectedEmail.summary ? (
+                      <div style={{ ...APPARAT, fontSize: '13px', fontWeight: 300, lineHeight: 1.65, color: 'rgba(255,255,255,0.7)', alignSelf: 'stretch', textAlign: 'right' }}>{selectedEmail.summary}</div>
+                    ) : (
+                      <div style={{ ...APPARAT, fontSize: '13px', fontWeight: 300, color: 'rgba(255,255,255,0.3)' }}>No summary.</div>
+                    )}
+                    {selectedEmail.autoReplyDraft && (selectedEmail.status === 'needs_review' || selectedEmail.status === 'auto_replied') && (
+                      <button
+                        onClick={() => handleApprove(selectedEmail.id)}
+                        disabled={approvingEmailId === selectedEmail.id || !gmailConnected}
+                        className="dispatch-btn-primary"
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '6px',
+                          padding: '8px 18px',
+                          borderRadius: '9999px',
+                          background: 'rgba(255,255,255,0.85)',
+                          color: '#0A0A0A',
+                          ...APPARAT,
+                          fontSize: '11px', fontWeight: 400,
+                          letterSpacing: '0.1em', textTransform: 'uppercase',
+                          border: 'none', cursor: 'pointer',
+                          opacity: approvingEmailId === selectedEmail.id ? 0.5 : 1,
+                        }}
+                      >
+                        <Check size={12} />
+                        {approvingEmailId === selectedEmail.id ? 'Approving…' : 'Approve & Send'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
           ) : (
-            /* Empty right state */
-            <div className="flex flex-1 items-center justify-center">
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+            }}>
               <div style={{
-                fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                fontSize: '13px', fontWeight: 400,
-                letterSpacing: '0.16em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.12)',
+                ...APPARAT,
+                fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.15)',
               }}>
-                Select an email
+                Select an item
               </div>
             </div>
           )}
@@ -359,113 +346,107 @@ export function CommandScreen() {
 
 // ── Sub-components ──
 
-function EmailBucketRow({
-  email, isSelected, onSelect,
-}: {
-  email: SupportEmail; isSelected: boolean; onSelect: () => void
-}) {
-  const dotColor = URGENCY_DOT[email.urgency ?? 'low'] ?? URGENCY_DOT.low
-  const label = CATEGORY_LABEL[email.category ?? ''] ?? 'PENDING'
-
+function BucketHeader({ count, label }: { count: number; label: string }) {
   return (
-    <div
-      onClick={onSelect}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '13px 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
-        background: isSelected ? 'rgba(255,255,255,0.05)' : 'transparent',
-        cursor: 'pointer',
-        transition: 'background 0.12s ease',
-        borderLeft: `2px solid ${isSelected ? dotColor : 'transparent'}`,
-      }}
-      onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.03)' }}
-      onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
-    >
-      {/* Square indicator */}
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      padding: '4px 2px',
+      fontFamily: "'KMR Apparat', system-ui, sans-serif",
+      fontSize: '9px', fontWeight: 600,
+      letterSpacing: '0.28em', textTransform: 'uppercase',
+      color: 'rgba(255,255,255,0.3)',
+    }}>
       <span style={{
-        width: '6px', height: '6px',
-        flexShrink: 0,
-        background: dotColor,
-        borderRadius: '1px',
-      }} />
-
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{
-          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-          fontSize: '11px', fontWeight: isSelected ? 600 : 500,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: isSelected ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          transition: 'color 0.12s ease',
-        }}>{label}</div>
-        <div style={{
-          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-          fontSize: '10px', fontWeight: 400,
-          color: 'rgba(255,255,255,0.22)',
-          marginTop: '2px',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>{email.from}</div>
-      </div>
+        fontSize: '11px', fontWeight: 600,
+        color: 'rgba(255,255,255,0.5)',
+        letterSpacing: '0',
+      }}>{count}</span>
+      {label}
     </div>
   )
 }
 
-function ClusterRow({
-  cluster, isSelected, onSelect,
-}: {
-  cluster: IssueCluster; isSelected: boolean; onSelect: () => void
+function EmailRow({ email, isSelected, onSelect }: {
+  email: SupportEmail; isSelected: boolean; onSelect: () => void
 }) {
-  const sevColor = cluster.severity === 'critical' ? '#f3755c' : cluster.severity === 'high' ? '#f3b36b' : cluster.severity === 'medium' ? '#f8e08f' : '#444f5e'
+  const label = CATEGORY_LABEL[email.category ?? ''] ?? 'Pending'
 
   return (
     <div
       onClick={onSelect}
+      className="dispatch-card-hover"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '13px 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
-        background: isSelected ? 'rgba(255,255,255,0.05)' : 'transparent',
+        background: isSelected ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.1)',
+        borderRadius: '8px',
+        padding: '14px 16px',
         cursor: 'pointer',
-        transition: 'background 0.12s ease',
-        borderLeft: `2px solid ${isSelected ? sevColor : 'transparent'}`,
+        borderLeft: `3px solid ${isSelected ? 'rgba(255,255,255,0.55)' : 'transparent'}`,
       }}
-      onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.03)' }}
-      onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
     >
-      <span style={{ width: '6px', height: '6px', flexShrink: 0, background: sevColor, borderRadius: '1px' }} />
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{
-          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-          fontSize: '11px', fontWeight: isSelected ? 600 : 500,
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: isSelected ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>Issues Tracking</div>
-        <div style={{
-          fontFamily: "'KMR Apparat', system-ui, sans-serif",
-          fontSize: '10px', color: 'rgba(255,255,255,0.22)',
-          marginTop: '2px',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>{cluster.emailCount} reports · {cluster.title}</div>
-      </div>
+      <div style={{
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
+        fontSize: '12px', fontWeight: isSelected ? 600 : 500,
+        color: isSelected ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.65)',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        marginBottom: '3px',
+      }}>{label}</div>
+      <div style={{
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.3)',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+      }}>{email.from}</div>
+    </div>
+  )
+}
+
+function ClusterRow({ cluster, isSelected, onSelect }: {
+  cluster: IssueCluster; isSelected: boolean; onSelect: () => void
+}) {
+  return (
+    <div
+      onClick={onSelect}
+      className="dispatch-card-hover"
+      style={{
+        background: isSelected ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.1)',
+        borderRadius: '8px',
+        padding: '14px 16px',
+        cursor: 'pointer',
+        borderLeft: `3px solid ${isSelected ? 'rgba(255,255,255,0.55)' : 'transparent'}`,
+      }}
+    >
+      <div style={{
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
+        fontSize: '12px', fontWeight: isSelected ? 600 : 500,
+        color: isSelected ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.65)',
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        marginBottom: '3px',
+      }}>{cluster.title}</div>
+      <div style={{
+        fontFamily: "'KMR Apparat', system-ui, sans-serif",
+        fontSize: '11px',
+        color: 'rgba(255,255,255,0.3)',
+      }}>{cluster.emailCount} reports · {cluster.severity}</div>
     </div>
   )
 }
 
 function ClusterDetail({ cluster }: { cluster: IssueCluster }) {
-  const sevColor = cluster.severity === 'critical' ? '#f3755c' : cluster.severity === 'high' ? '#f3b36b' : '#f8e08f'
-
   return (
-    <div style={{ padding: '28px 36px', flex: 1, overflowY: 'auto' }}>
+    <div style={{
+      flex: 1,
+      background: 'rgba(255,255,255,0.1)',
+      borderRadius: '8px',
+      padding: '32px 36px',
+      overflowY: 'auto',
+    }}>
       <div style={{
         fontFamily: "'KMR Apparat', system-ui, sans-serif",
         fontSize: '9px', fontWeight: 600, letterSpacing: '0.3em',
-        textTransform: 'uppercase', color: sevColor, marginBottom: '12px',
+        textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)',
+        marginBottom: '12px',
       }}>{cluster.severity} · {cluster.emailCount} reports</div>
       <div style={{
         fontFamily: "'KMR Apparat', system-ui, sans-serif",
@@ -480,7 +461,7 @@ function ClusterDetail({ cluster }: { cluster: IssueCluster }) {
         lineHeight: 1.7, color: 'rgba(255,255,255,0.45)',
         maxWidth: '560px',
       }}>
-        <span style={{ color: '#f3b36b', fontWeight: 600 }}>Recommended action: </span>
+        <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>Recommended action: </span>
         {cluster.suggestedAction}
       </div>
     </div>
@@ -493,8 +474,7 @@ function EmptyState({ label }: { label: string }) {
       padding: '40px 20px',
       textAlign: 'center',
       fontFamily: "'KMR Apparat', system-ui, sans-serif",
-      fontSize: '11px', letterSpacing: '0.14em',
-      textTransform: 'uppercase',
+      fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase',
       color: 'rgba(255,255,255,0.15)',
     }}>{label}</div>
   )

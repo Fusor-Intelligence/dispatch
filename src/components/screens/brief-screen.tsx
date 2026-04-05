@@ -1,224 +1,170 @@
 'use client'
 
 import { ScreenShell } from '@/components/layout/screen-shell'
-import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
-import { CheckCircle, AlertTriangle, Layers, ArrowRight } from 'lucide-react'
+import { APPARAT } from '@/lib/constants'
 
 export function BriefScreen() {
-  const { emails, clusters, stats, navigateTo } = useDispatchStore()
+  const { emails, clusters, stats } = useDispatchStore()
 
-  const totalEmails = stats?.totalEmails ?? emails.length
-  const handledCount = emails.filter((e) => e.status === 'auto_replied' || e.status === 'resolved').length
-  const reviewCount = emails.filter((e) => e.status === 'needs_review').length
+  const totalEmails  = stats?.totalEmails ?? emails.length
+  const handledCount = emails.filter(e => e.status === 'auto_replied' || e.status === 'resolved').length
+  const reviewCount  = emails.filter(e => e.status === 'needs_review').length
   const incidentCount = clusters.length
-  const heroCluster = clusters[0] ?? null
-  const biggestClusterEmailCount = heroCluster?.emailCount ?? 0
+  const heroCluster  = clusters[0] ?? null
 
-  const narrativeLines = [
-    { text: 'I reviewed', value: totalEmails, suffix: 'support emails.' },
-    { text: '', value: handledCount, suffix: 'can be handled automatically.' },
-    { text: '', value: reviewCount, suffix: 'need human review.' },
-    ...(biggestClusterEmailCount > 1
-      ? [{ text: '', value: biggestClusterEmailCount, suffix: 'appear tied to the same issue.' }]
-      : []),
+  const quoteText = [
+    `I Reviewed ${totalEmails} Support Emails.`,
+    `${handledCount} Can Be Handled Automatically.`,
+    `${reviewCount} Need Human Review.`,
+    ...(incidentCount > 0 ? [`${incidentCount} ${incidentCount === 1 ? 'Pattern' : 'Patterns'} Detected.`] : []),
+  ].join(' ')
+
+  const quoteWords = quoteText.split(' ')
+
+  const insightCards = [
+    { label: 'Insight 01', value: handledCount,   sub: 'Auto-replied or resolved'  },
+    { label: 'Insight 02', value: reviewCount,    sub: 'Need Human Review'          },
+    { label: 'Insight 03', value: totalEmails,    sub: 'Can Be Handled Automatically' },
   ]
 
   return (
-    <ScreenShell className="flex flex-col overflow-hidden">
-      {/* ── Top bar ── */}
-      <TopBar label="Brief" />
+    <ScreenShell
+      className="flex flex-col overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0A0A0A 50%, #1C1C1C 112.05%, #2E4246 136.61%)' }}
+    >
+      {/* Body */}
+      <div
+        className="flex min-h-0 flex-1 flex-col"
+        style={{ padding: '36px 36px 36px 36px' }}
+      >
+        {/* AGENT: label */}
+        <div className="stagger-fade-up" style={{
+          '--stagger': 0,
+          ...APPARAT,
+          fontWeight: 300,
+          fontSize: '18px',
+          lineHeight: '48px',
+          textTransform: 'uppercase',
+          color: '#FFFFFF',
+          marginBottom: '0px',
+        } as React.CSSProperties}>
+          Agent:
+        </div>
 
-      {/* ── Scrollable body ── */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl px-[42px] xl:px-16 py-12">
-
-          {/* Narrative */}
-          <div className="mb-10 space-y-2 text-center">
-            {narrativeLines.map((line, i) => (
-              <div
-                key={i}
-                className="number-reveal"
-                style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '32px',
-                  fontWeight: 300,
-                  lineHeight: 1.45,
-                  color: 'rgba(255,255,255,0.75)',
-                  animationDelay: `${i * 150}ms`,
-                }}
-              >
-                {line.text}{line.text ? ' ' : ''}
-                <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>{line.value}</span>{' '}
-                {line.suffix}
-              </div>
+        {/* Quote — word-by-word reveal */}
+        <div
+          className="flex-1 flex items-start stagger-fade-up"
+          style={{ '--stagger': 1, paddingBottom: '32px' } as React.CSSProperties}
+        >
+          <div className="word-reveal" style={{
+            ...APPARAT,
+            fontWeight: 300,
+            fontSize: '48px',
+            lineHeight: '48px',
+            textTransform: 'capitalize',
+            color: '#F6F1E8',
+            maxWidth: '943px',
+          }}>
+            {quoteWords.map((word, i) => (
+              <span key={i} style={{ '--word-i': i } as React.CSSProperties}>
+                {word}{i < quoteWords.length - 1 ? ' ' : ''}
+              </span>
             ))}
           </div>
+        </div>
 
-          {/* Three summary cards */}
-          <div className="mb-8 grid gap-4 sm:grid-cols-3">
-            {/* Handled */}
+        {/* Cards row */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '14px',
+          flexShrink: 0,
+          height: '165px',
+        }}>
+          {insightCards.map((card, i) => (
             <div
+              key={card.label}
+              className="stagger-fade-up dispatch-card-hover"
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '16px',
-                padding: '20px',
-              }}
+                '--stagger': 3 + i,
+                position: 'relative',
+                flex: 1,
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                padding: '20px 17px',
+                gap: '10px',
+                isolation: 'isolate',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+              } as React.CSSProperties}
             >
-              <CheckCircle size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{handledCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Handled</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Auto-replied or resolved by AI</div>
-            </div>
+              {/* Accent rectangle */}
+              <div style={{
+                position: 'absolute',
+                width: '6px',
+                height: '7px',
+                left: '17px',
+                top: '60px',
+                background: 'rgba(217,217,217,0.5)',
+                zIndex: 1,
+              }} />
 
-            {/* Needs Judgment */}
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '16px',
-                padding: '20px',
-              }}
-            >
-              <AlertTriangle size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{reviewCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Needs Judgment</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Requires human review before action</div>
-            </div>
-
-            {/* Recurring Incidents */}
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '16px',
-                padding: '20px',
-              }}
-            >
-              <Layers size={24} style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '36px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>{incidentCount}</div>
-              <div style={{ marginTop: '4px', fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Recurring Incidents</div>
-              <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: "'KMR Apparat', system-ui, sans-serif" }}>Clusters of related complaints</div>
-            </div>
-          </div>
-
-          {/* Hero cluster card */}
-          {heroCluster && (
-            <div
-              className="mb-8"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderLeftWidth: '3px',
-                borderLeftColor: 'rgba(255,255,255,0.25)',
-                borderRadius: '16px',
-                padding: '24px',
-              }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div
-                    style={{
-                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                      fontSize: '9px',
-                      fontWeight: 600,
-                      letterSpacing: '0.2em',
-                      textTransform: 'uppercase',
-                      color: 'rgba(255,255,255,0.2)',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    Biggest Pattern
+              {/* Inner wrapper */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: '60px',
+                alignSelf: 'stretch',
+              }}>
+                {/* Top row: label + number */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  alignSelf: 'stretch',
+                }}>
+                  <div style={{
+                    ...APPARAT,
+                    fontWeight: 300,
+                    fontSize: '18px',
+                    lineHeight: '100%',
+                    textTransform: 'capitalize',
+                    color: '#FFFFFF',
+                  }}>
+                    {card.label}
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'rgba(255,255,255,0.82)',
-                    }}
-                  >
-                    {heroCluster.title}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: '8px',
-                      fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.35)',
-                    }}
-                  >
-                    {heroCluster.emailCount} reports · Severity: {heroCluster.severity}
-                    {heroCluster.trending && ' · Trending'}
+                  <div style={{
+                    ...APPARAT,
+                    fontWeight: 300,
+                    fontSize: '64px',
+                    lineHeight: '48px',
+                    textTransform: 'capitalize',
+                    color: '#FFFFFF',
+                  }}>
+                    {card.value}
                   </div>
                 </div>
-                <span
-                  style={{
-                    flexShrink: 0,
-                    borderRadius: '9999px',
-                    padding: '6px 12px',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    background: 'rgba(255,255,255,0.06)',
-                    fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                    fontSize: '9px',
-                    fontWeight: 600,
-                    letterSpacing: '0.22em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.5)',
-                  }}
-                >
-                  {heroCluster.severity}
-                </span>
-              </div>
-              <div
-                style={{
-                  marginTop: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  background: 'rgba(255,255,255,0.04)',
-                  padding: '16px',
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '13px',
-                  lineHeight: 1.6,
-                  color: 'rgba(255,255,255,0.65)',
-                }}
-              >
-                <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Recommended action:</span>{' '}
-                {heroCluster.suggestedAction}
+
+                {/* Description — right-aligned */}
+                <div style={{
+                  ...APPARAT,
+                  fontWeight: 300,
+                  fontSize: '18px',
+                  lineHeight: '100%',
+                  textAlign: 'right',
+                  textTransform: 'capitalize',
+                  color: '#FFFFFF',
+                  alignSelf: 'stretch',
+                }}>
+                  {card.sub}
+                </div>
               </div>
             </div>
-          )}
-
-          {/* CTA */}
-          <div className="text-center">
-            <button
-              onClick={() => navigateTo('rules')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                borderRadius: '9999px',
-                background: '#fff',
-                color: '#0A0A0A',
-                border: 'none',
-                padding: '14px 32px',
-                fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                fontSize: '13px',
-                fontWeight: 600,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                transition: 'opacity 0.15s ease',
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.88' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1' }}
-            >
-              Set Rules
-              <ArrowRight size={16} />
-            </button>
-          </div>
-
+          ))}
         </div>
       </div>
     </ScreenShell>

@@ -1,11 +1,9 @@
 'use client'
 
 import { ScreenShell } from '@/components/layout/screen-shell'
-import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { seedDemo } from '@/lib/api'
 import { Zap, MessageSquare, AlertTriangle, Layers } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const ICONS: Record<string, typeof Zap> = { Zap, MessageSquare, AlertTriangle, Layers }
 
@@ -49,86 +47,52 @@ export function DeployScreen() {
 
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
-      {/* ── Top bar ── */}
-      <TopBar label="Configure" />
-
       {/* ── Body ── */}
-      <div className="flex flex-1 items-center justify-center overflow-y-auto px-[42px] py-10 xl:px-16">
-        <div className="grid w-full max-w-[1320px] gap-12 xl:grid-cols-[1fr_1.25fr] xl:items-center">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto" style={{ padding: '36px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.25fr', gap: '64px', width: '100%', maxWidth: '1320px', alignItems: 'center' }}>
 
           {/* Left: Brand */}
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* Kicker */}
-            <div style={{
+            <div className="stagger-fade-up" style={{
+              '--stagger': 0,
               fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '9px',
-              fontWeight: 600,
+              fontWeight: 300,
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.2)',
-            }}>
+            } as React.CSSProperties}>
               Mission Briefing
             </div>
 
             {/* Brand lockup */}
-            <div className="flex items-start gap-5">
-              {/* D icon */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '64px',
-                width: '64px',
-                flexShrink: 0,
-                borderRadius: '1.6rem',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.06)',
+            <div className="stagger-fade-up" style={{ '--stagger': 1 } as React.CSSProperties}>
+              <p style={{
+                maxWidth: '420px',
+                fontSize: '15px',
+                fontWeight: 300,
+                lineHeight: 1.75,
+                color: 'rgba(255,255,255,0.45)',
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                fontSize: '28px',
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.82)',
               }}>
-                D
-              </div>
-
-              <div>
-                <h1 style={{
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                  fontSize: '56px',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '-0.03em',
-                  color: 'rgba(255,255,255,0.85)',
-                }}>
-                  Dispatch
-                </h1>
-                <p style={{
-                  marginTop: '12px',
-                  maxWidth: '420px',
-                  fontSize: '15px',
-                  lineHeight: 1.75,
-                  color: 'rgba(255,255,255,0.45)',
-                  fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                }}>
-                  Assign an AI operator to your support inbox. It reads, triages,
-                  drafts replies, and surfaces the issues that matter — you approve
-                  the decisions.
-                </p>
-              </div>
+                Your AI support operator. It reads every conversation, drafts
+                replies, flags what needs attention — you stay in control.
+              </p>
             </div>
 
             {/* Gmail status pill */}
-            <div className="flex flex-wrap gap-2.5">
+            <div className="stagger-fade-up" style={{ '--stagger': 2 } as React.CSSProperties}>
               <span style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '7px',
                 padding: '5px 12px',
                 borderRadius: '9999px',
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(255,255,255,0.04)',
+                background: 'rgba(255,255,255,0.06)',
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '11px',
+                fontWeight: 300,
                 letterSpacing: '0.06em',
                 color: 'rgba(255,255,255,0.45)',
               }}>
@@ -145,18 +109,18 @@ export function DeployScreen() {
           </div>
 
           {/* Right: Mission Config */}
-          <div className="space-y-5">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Connect inbox card */}
-            <div style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
+            <div className="stagger-fade-up dispatch-card-hover" style={{
+              '--stagger': 3,
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '8px',
               padding: '24px',
-            }}>
+            } as React.CSSProperties}>
               <div style={{
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '17px',
-                fontWeight: 600,
+                fontWeight: 400,
                 color: 'rgba(255,255,255,0.82)',
               }}>
                 Connect your support inbox
@@ -164,6 +128,7 @@ export function DeployScreen() {
               <p style={{
                 marginTop: '4px',
                 fontSize: '13px',
+                fontWeight: 300,
                 color: 'rgba(255,255,255,0.35)',
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
               }}>
@@ -172,23 +137,24 @@ export function DeployScreen() {
             </div>
 
             {/* Mission presets */}
-            <div className="grid grid-cols-2 gap-3">
-              {missionPresets.map((preset) => {
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              {missionPresets.map((preset, i) => {
                 const Icon = ICONS[preset.icon] || Zap
                 return (
                   <button
                     key={preset.id}
                     onClick={() => togglePreset(preset.id)}
+                    className="stagger-fade-up dispatch-card-hover"
                     style={{
-                      background: preset.selected ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${preset.selected ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'}`,
-                      borderRadius: '14px',
+                      '--stagger': 4 + i,
+                      background: preset.selected ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)',
+                      borderRadius: '8px',
                       padding: '16px',
                       textAlign: 'left',
                       cursor: 'pointer',
-                      transition: 'background 0.15s ease, border-color 0.15s ease',
                       fontFamily: "'KMR Apparat', system-ui, sans-serif",
-                    }}
+                      border: 'none',
+                    } as React.CSSProperties}
                   >
                     <Icon
                       size={20}
@@ -200,7 +166,7 @@ export function DeployScreen() {
                     />
                     <div style={{
                       fontSize: '13px',
-                      fontWeight: 600,
+                      fontWeight: 400,
                       color: 'rgba(255,255,255,0.82)',
                     }}>
                       {preset.label}
@@ -208,6 +174,7 @@ export function DeployScreen() {
                     <div style={{
                       marginTop: '3px',
                       fontSize: '11px',
+                      fontWeight: 300,
                       color: 'rgba(255,255,255,0.35)',
                     }}>
                       {preset.description}
@@ -218,7 +185,7 @@ export function DeployScreen() {
             </div>
 
             {/* Guardrails */}
-            <div style={{ borderRadius: '14px' }}>
+            <div className="stagger-fade-up" style={{ '--stagger': 8 } as React.CSSProperties}>
               {guardrails.map((g, i) => (
                 <button
                   key={g.id}
@@ -242,22 +209,22 @@ export function DeployScreen() {
                 >
                   <span style={{
                     fontSize: '13px',
+                    fontWeight: 300,
                     color: 'rgba(255,255,255,0.7)',
                   }}>
                     {g.label}
                   </span>
                   {/* Toggle */}
-                  <span style={{
+                  <span className="dispatch-toggle-track" style={{
                     position: 'relative',
                     display: 'inline-block',
                     height: '20px',
                     width: '36px',
                     borderRadius: '9999px',
                     background: g.enabled ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.12)',
-                    transition: 'background 0.2s ease',
                     flexShrink: 0,
                   }}>
-                    <span style={{
+                    <span className="dispatch-toggle-thumb" style={{
                       position: 'absolute',
                       top: '2px',
                       left: g.enabled ? '16px' : '2px',
@@ -265,7 +232,6 @@ export function DeployScreen() {
                       width: '16px',
                       borderRadius: '9999px',
                       background: '#0A0A0A',
-                      transition: 'left 0.2s ease',
                     }} />
                   </span>
                 </button>
@@ -273,48 +239,47 @@ export function DeployScreen() {
             </div>
 
             {/* CTAs */}
-            <div style={{
+            <div className="stagger-fade-up" style={{
+              '--stagger': 9,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '12px',
               paddingTop: '4px',
-            }}>
+            } as React.CSSProperties}>
               {!gmailConnected ? (
                 <button
                   onClick={handleConnectGmail}
+                  className="dispatch-btn-ghost"
                   style={{
                     borderRadius: '9999px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'transparent',
-                    padding: '12px 20px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: 'none',
+                    padding: '14px 32px',
                     fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '13px',
+                    fontWeight: 300,
                     color: 'rgba(255,255,255,0.4)',
                     cursor: 'pointer',
-                    transition: 'background 0.15s ease',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
                 >
                   Connect Gmail
                 </button>
               ) : (
                 <button
                   onClick={handleStartDemo}
+                  className="dispatch-btn-ghost"
                   style={{
                     borderRadius: '9999px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'transparent',
-                    padding: '12px 20px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: 'none',
+                    padding: '14px 32px',
                     fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '13px',
+                    fontWeight: 300,
                     color: 'rgba(255,255,255,0.4)',
                     cursor: 'pointer',
-                    transition: 'background 0.15s ease',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
                 >
                   Use Demo Data
                 </button>
@@ -322,6 +287,7 @@ export function DeployScreen() {
 
               <button
                 onClick={handleStartSweep}
+                className="dispatch-btn-primary"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -332,20 +298,11 @@ export function DeployScreen() {
                   color: '#0A0A0A',
                   fontFamily: "'KMR Apparat', system-ui, sans-serif",
                   fontSize: '13px',
-                  fontWeight: 600,
+                  fontWeight: 400,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   border: 'none',
                   cursor: 'pointer',
-                  transition: 'filter 0.2s ease, transform 0.2s cubic-bezier(0, .55, .45, 1)',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(0.92)';
-                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.02)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1)';
-                  (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
                 }}
               >
                 <Zap size={15} />

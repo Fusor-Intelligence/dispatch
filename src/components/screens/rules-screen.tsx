@@ -1,10 +1,8 @@
 'use client'
 
 import { ScreenShell } from '@/components/layout/screen-shell'
-import { TopBar } from '@/components/layout/top-bar'
 import { useDispatchStore } from '@/lib/store'
 import { ArrowRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { TonePreset } from '@/lib/types'
 
 const TOGGLE_RULES = [
@@ -25,49 +23,52 @@ export function RulesScreen() {
 
   return (
     <ScreenShell className="flex flex-col overflow-hidden">
-      {/* ── Top bar ── */}
-      <TopBar label="Rules" />
-
       {/* ── Scrollable body ── */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-2xl px-[42px] xl:px-16 py-12">
+        <div style={{ padding: '36px' }}>
 
           {/* Heading */}
           <h2
+            className="stagger-fade-up"
             style={{
+              '--stagger': 0,
               fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '36px',
               fontWeight: 300,
               textAlign: 'center',
               color: 'rgba(255,255,255,0.82)',
               marginBottom: '12px',
-            }}
+            } as React.CSSProperties}
           >
             Teach Dispatch how to operate
           </h2>
           <p
+            className="stagger-fade-up"
             style={{
+              '--stagger': 1,
               fontFamily: "'KMR Apparat', system-ui, sans-serif",
               fontSize: '14px',
+              fontWeight: 300,
               textAlign: 'center',
               color: 'rgba(255,255,255,0.35)',
               maxWidth: '400px',
               margin: '0 auto 32px',
               lineHeight: 1.6,
-            }}
+            } as React.CSSProperties}
           >
             Based on the briefing, configure how aggressively Dispatch should act on your behalf.
           </p>
 
           {/* Confidence threshold panel */}
           <div
+            className="stagger-fade-up dispatch-card-hover"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
+              '--stagger': 2,
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '8px',
               padding: '20px',
-              marginBottom: '20px',
-            }}
+              marginBottom: '8px',
+            } as React.CSSProperties}
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -75,7 +76,7 @@ export function RulesScreen() {
                   style={{
                     fontFamily: "'KMR Apparat', system-ui, sans-serif",
                     fontSize: '9px',
-                    fontWeight: 600,
+                    fontWeight: 300,
                     letterSpacing: '0.3em',
                     textTransform: 'uppercase',
                     color: 'rgba(255,255,255,0.25)',
@@ -110,6 +111,7 @@ export function RulesScreen() {
                   justifyContent: 'space-between',
                   fontSize: '9px',
                   fontFamily: "'KMR Apparat', system-ui, sans-serif",
+                  fontWeight: 300,
                   color: 'rgba(255,255,255,0.18)',
                   letterSpacing: '0.1em',
                 }}
@@ -122,13 +124,14 @@ export function RulesScreen() {
 
           {/* Toggle rules */}
           <div
+            className="stagger-fade-up"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
-              marginBottom: '20px',
+              '--stagger': 3,
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+              marginBottom: '8px',
               overflow: 'hidden',
-            }}
+            } as React.CSSProperties}
           >
             {TOGGLE_RULES.map((rule, idx) => (
               <button
@@ -152,7 +155,7 @@ export function RulesScreen() {
                     style={{
                       fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '14px',
-                      fontWeight: 500,
+                      fontWeight: 400,
                       color: 'rgba(255,255,255,0.82)',
                       marginBottom: '2px',
                     }}
@@ -163,14 +166,16 @@ export function RulesScreen() {
                     style={{
                       fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '12px',
+                      fontWeight: 300,
                       color: 'rgba(255,255,255,0.35)',
                     }}
                   >
                     {rule.desc}
                   </div>
                 </div>
-                {/* Toggle track */}
+                {/* Toggle track — spring animation */}
                 <span
+                  className="dispatch-toggle-track"
                   style={{
                     position: 'relative',
                     flexShrink: 0,
@@ -180,10 +185,10 @@ export function RulesScreen() {
                     height: '20px',
                     borderRadius: '9999px',
                     background: agentRules[rule.key] ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.12)',
-                    transition: 'background 0.15s ease',
                   }}
                 >
                   <span
+                    className="dispatch-toggle-thumb"
                     style={{
                       position: 'absolute',
                       top: '2px',
@@ -193,7 +198,6 @@ export function RulesScreen() {
                       borderRadius: '9999px',
                       background: '#0A0A0A',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-                      transition: 'left 0.15s ease',
                     }}
                   />
                 </span>
@@ -203,19 +207,20 @@ export function RulesScreen() {
 
           {/* Tone selector */}
           <div
+            className="stagger-fade-up"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '16px',
+              '--stagger': 4,
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '8px',
               padding: '20px',
               marginBottom: '32px',
-            }}
+            } as React.CSSProperties}
           >
             <div
               style={{
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '13px',
-                fontWeight: 500,
+                fontWeight: 300,
                 color: 'rgba(255,255,255,0.45)',
                 marginBottom: '12px',
                 letterSpacing: '0.04em',
@@ -228,23 +233,24 @@ export function RulesScreen() {
                 <button
                   key={opt.key}
                   onClick={() => setAgentRules({ tone: opt.key })}
+                  className="dispatch-card-hover"
                   style={{
-                    borderRadius: '12px',
+                    borderRadius: '8px',
                     border: '1px solid',
                     borderColor: agentRules.tone === opt.key ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.07)',
                     background: agentRules.tone === opt.key ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.03)',
                     padding: '12px',
                     textAlign: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease',
                   }}
                 >
                   <div
                     style={{
                       fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '13px',
-                      fontWeight: 600,
+                      fontWeight: 400,
                       color: agentRules.tone === opt.key ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.4)',
+                      transition: 'color 0.15s ease',
                     }}
                   >
                     {opt.label}
@@ -253,8 +259,10 @@ export function RulesScreen() {
                     style={{
                       fontFamily: "'KMR Apparat', system-ui, sans-serif",
                       fontSize: '10px',
+                      fontWeight: 300,
                       marginTop: '2px',
                       color: agentRules.tone === opt.key ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.2)',
+                      transition: 'color 0.15s ease',
                     }}
                   >
                     {opt.desc}
@@ -265,9 +273,10 @@ export function RulesScreen() {
           </div>
 
           {/* CTA */}
-          <div className="text-center">
+          <div className="stagger-fade-up text-center" style={{ '--stagger': 5 } as React.CSSProperties}>
             <button
               onClick={() => navigateTo('command')}
+              className="dispatch-btn-primary"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -279,14 +288,11 @@ export function RulesScreen() {
                 padding: '14px 32px',
                 fontFamily: "'KMR Apparat', system-ui, sans-serif",
                 fontSize: '13px',
-                fontWeight: 600,
+                fontWeight: 400,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
-                transition: 'opacity 0.15s ease',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.88' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1' }}
             >
               Activate Dispatch
               <ArrowRight size={16} />
